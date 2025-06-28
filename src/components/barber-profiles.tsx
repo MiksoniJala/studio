@@ -35,31 +35,27 @@ export function BarberProfiles({ onSelectBarber }: BarberProfilesProps) {
         {barbers.map((barber) => (
           <div 
             key={barber.name} 
-            className={`flex flex-col sm:flex-row items-center sm:items-start gap-6 p-4 rounded-lg border-2 ${isSelectable ? 'border-transparent hover:border-primary hover:shadow-2xl hover:scale-105 cursor-pointer transform transition-all duration-300' : 'border-none'}`}
+            className={`flex flex-col items-center text-center gap-4 p-6 rounded-lg border-2 ${isSelectable ? 'border-transparent hover:border-primary hover:shadow-2xl hover:scale-105 cursor-pointer transform transition-all duration-300' : 'border-none'}`}
             onClick={() => onSelectBarber?.(barber.name)}
             role={isSelectable ? 'button' : undefined}
             tabIndex={isSelectable ? 0 : -1}
             onKeyDown={(e) => {
                 if(isSelectable && (e.key === 'Enter' || e.key === ' ')) {
                     e.preventDefault();
-                    onSelectBarber(barber.name);
+                    onSelectBarber?.(barber.name);
                 }
             }}
           >
-            <div className="flex-shrink-0">
-                <Image 
-                    src={barber.image}
-                    alt={`Portret ${barber.name}`}
-                    width={150}
-                    height={150}
-                    className="rounded-full object-cover border-4 border-card shadow-lg"
-                    data-ai-hint={barber.hint}
-                />
-            </div>
-            <div className="text-center sm:text-left">
-                <h3 className="font-headline text-2xl font-semibold">{barber.name}</h3>
-                <p className="mt-2 text-muted-foreground">{barber.description}</p>
-            </div>
+            <Image 
+                src={barber.image}
+                alt={`Portret ${barber.name}`}
+                width={150}
+                height={150}
+                className="rounded-full object-cover border-4 border-card shadow-lg"
+                data-ai-hint={barber.hint}
+            />
+            <h3 className="font-headline text-2xl font-semibold mt-2">{barber.name}</h3>
+            <p className="mt-1 text-muted-foreground max-w-md">{barber.description}</p>
           </div>
         ))}
       </div>

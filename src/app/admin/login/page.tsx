@@ -1,3 +1,4 @@
+
 import { loginAction } from "@/lib/actions";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,24 +18,24 @@ export default function AdminLoginPage() {
       <Card className="w-full max-w-sm">
         <form action={loginAction}>
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-headline">Admin Access</CardTitle>
+            <CardTitle className="text-2xl font-headline">Administratorski Pristup</CardTitle>
             <CardDescription>
-              Enter your credentials to access the dashboard.
+              Unesite svoje podatke za pristup kontrolnoj tabli.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="admin@barbertime.com" defaultValue="admin@barbertime.com" required />
+              <Input id="email" type="email" placeholder="admin@primjer.com" defaultValue="admin@primjer.com" required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Lozinka</Label>
               <Input id="password" type="password" defaultValue="password" required />
             </div>
           </CardContent>
           <CardFooter>
             <Button className="w-full" type="submit">
-              Sign In
+              Prijavi se
             </Button>
           </CardFooter>
         </form>

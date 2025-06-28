@@ -24,15 +24,15 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useToast } from "@/hooks/use-toast";
 
 const bookingSchema = z.object({
-  date: z.date({ required_error: "Please select a date." }),
-  time: z.string({ required_error: "Please select a time." }),
-  barber: z.enum(["Mirsad", "Huske"], { required_error: "Please select a barber." }),
-  name: z.string().min(2, "Name must be at least 2 characters."),
-  phone: z.string().min(5, "Please enter a valid phone number."),
+  date: z.date({ required_error: "Molimo odaberite datum." }),
+  time: z.string({ required_error: "Molimo odaberite vrijeme." }),
+  barber: z.enum(["Mirsad", "Huske"], { required_error: "Molimo odaberite barbera." }),
+  name: z.string().min(2, "Ime mora sadržavati najmanje 2 karaktera."),
+  phone: z.string().min(5, "Molimo unesite važeći broj telefona."),
 });
 
-const timeSlots = Array.from({ length: 18 }, (_, i) => {
-    const hour = Math.floor(i / 2) + 9;
+const timeSlots = Array.from({ length: 16 }, (_, i) => {
+    const hour = Math.floor(i / 2) + 8;
     const minute = i % 2 === 0 ? "00" : "30";
     return `${String(hour).padStart(2, '0')}:${minute}`;
 });
@@ -83,8 +83,8 @@ export function BookingForm() {
         } else {
             toast({
                 variant: "destructive",
-                title: "Booking Failed",
-                description: result.error || "Something went wrong. Please try again.",
+                title: "Rezervacija neuspješna",
+                description: result.error || "Nešto je pošlo po zlu. Molimo pokušajte ponovo.",
             });
         }
     });
@@ -93,15 +93,15 @@ export function BookingForm() {
   return (
     <Card className="w-full max-w-3xl mx-auto shadow-2xl">
       <CardHeader>
-        <CardTitle className="font-headline text-3xl">Book Your Slot</CardTitle>
+        <CardTitle className="font-headline text-3xl">Rezervišite Svoj Termin</CardTitle>
         <CardDescription>
-            {step < 5 && `Step ${step} of 4 - ${
-                step === 1 ? "Choose Date & Time" : 
-                step === 2 ? "Select Your Barber" :
-                step === 3 ? "Your Information" :
-                "Confirm Your Booking"
+            {step < 5 && `Korak ${step} od 4 - ${
+                step === 1 ? "Odaberite Datum i Vrijeme" : 
+                step === 2 ? "Odaberite Svog Barbera" :
+                step === 3 ? "Vaše Informacije" :
+                "Potvrdite Vašu Rezervaciju"
             }`}
-            {step === 5 && "Booking Confirmed!"}
+            {step === 5 && "Rezervacija Potvrđena!"}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -121,7 +121,7 @@ export function BookingForm() {
                               variant={"outline"}
                               className={cn("w-[240px] pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
                             >
-                              {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                              {field.value ? format(field.value, "PPP") : <span>Izaberite datum</span>}
                               <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                             </Button>
                           </FormControl>
@@ -160,15 +160,15 @@ export function BookingForm() {
                   })}
                 </div>
 
-                {isPending && <p className="text-center text-muted-foreground">Checking availability...</p>}
+                {isPending && <p className="text-center text-muted-foreground">Provjera dostupnosti...</p>}
                 
                 {suggestions && (
                   <Alert variant="destructive">
                     <AlertTriangle className="h-4 w-4" />
-                    <AlertTitle>Time Slot Unavailable</AlertTitle>
+                    <AlertTitle>Termin Nije Dostupan</AlertTitle>
                     <AlertDescription>
                       <p className="mb-2">{suggestions.reason}</p>
-                      {suggestions.alternativeTimes.length > 0 && <p className="font-semibold mb-2">We suggest these alternative times:</p>}
+                      {suggestions.alternativeTimes.length > 0 && <p className="font-semibold mb-2">Predlažemo ove alternativne termine:</p>}
                       <div className="flex gap-2">
                         {suggestions.alternativeTimes.map(altTime => (
                           <Button key={altTime} variant="secondary" size="sm" onClick={() => handleTimeSelect(altTime)}>
@@ -188,7 +188,7 @@ export function BookingForm() {
                 name="barber"
                 render={({ field }) => (
                     <FormItem className="space-y-3">
-                    <FormLabel className="text-xl font-headline">Choose your artisan</FormLabel>
+                    <FormLabel className="text-xl font-headline">Odaberite svog majstora</FormLabel>
                     <FormControl>
                       <RadioGroup
                         onValueChange={field.onChange}
@@ -224,9 +224,9 @@ export function BookingForm() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Full Name</FormLabel>
+                      <FormLabel>Puno Ime</FormLabel>
                       <FormControl>
-                        <Input placeholder="John Doe" {...field} />
+                        <Input placeholder="Neko Nekić" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -237,9 +237,9 @@ export function BookingForm() {
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone Number</FormLabel>
+                      <FormLabel>Broj Telefona</FormLabel>
                       <FormControl>
-                        <Input placeholder="555-123-4567" {...field} />
+                        <Input placeholder="061-123-456" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -250,19 +250,19 @@ export function BookingForm() {
             
             {step === 4 && (
                 <div className="space-y-6 text-center">
-                    <h3 className="font-headline text-2xl">Confirm Your Booking</h3>
+                    <h3 className="font-headline text-2xl">Potvrdite Vašu Rezervaciju</h3>
                     <Card className="text-left max-w-md mx-auto">
                         <CardContent className="p-6 space-y-4">
-                            <div className="flex items-center gap-4"><CalendarIcon className="w-5 h-5 text-muted-foreground" /><p><strong>Date:</strong> {format(form.getValues("date"), "PPP")}</p></div>
-                            <div className="flex items-center gap-4"><Clock className="w-5 h-5 text-muted-foreground" /><p><strong>Time:</strong> {form.getValues("time")}</p></div>
+                            <div className="flex items-center gap-4"><CalendarIcon className="w-5 h-5 text-muted-foreground" /><p><strong>Datum:</strong> {format(form.getValues("date"), "PPP")}</p></div>
+                            <div className="flex items-center gap-4"><Clock className="w-5 h-5 text-muted-foreground" /><p><strong>Vrijeme:</strong> {form.getValues("time")}</p></div>
                             <div className="flex items-center gap-4"><Scissors className="w-5 h-5 text-muted-foreground" /><p><strong>Barber:</strong> {form.getValues("barber")}</p></div>
-                            <div className="flex items-center gap-4"><User className="w-5 h-5 text-muted-foreground" /><p><strong>Name:</strong> {form.getValues("name")}</p></div>
-                            <div className="flex items-center gap-4"><Phone className="w-5 h-5 text-muted-foreground" /><p><strong>Phone:</strong> {form.getValues("phone")}</p></div>
+                            <div className="flex items-center gap-4"><User className="w-5 h-5 text-muted-foreground" /><p><strong>Ime:</strong> {form.getValues("name")}</p></div>
+                            <div className="flex items-center gap-4"><Phone className="w-5 h-5 text-muted-foreground" /><p><strong>Telefon:</strong> {form.getValues("phone")}</p></div>
                         </CardContent>
                     </Card>
                     <Button type="submit" size="lg" disabled={isPending}>
                         {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Confirm Booking
+                        Potvrdi Rezervaciju
                     </Button>
                 </div>
             )}
@@ -270,10 +270,10 @@ export function BookingForm() {
             {step === 5 && (
                 <div className="text-center py-10">
                     <PartyPopper className="w-16 h-16 mx-auto text-primary" />
-                    <h3 className="font-headline text-2xl mt-4">All Set!</h3>
-                    <p className="text-muted-foreground mt-2">Your appointment is confirmed. We're looking forward to seeing you.</p>
+                    <h3 className="font-headline text-2xl mt-4">Sve je spremno!</h3>
+                    <p className="text-muted-foreground mt-2">Vaš termin je potvrđen. Radujemo se vašem dolasku.</p>
                     <div className="mt-6">
-                        <Button variant="outline" onClick={() => { form.reset(); setStep(1); }}>Book Another Appointment</Button>
+                        <Button variant="outline" onClick={() => { form.reset(); setStep(1); }}>Rezerviši Novi Termin</Button>
                     </div>
                 </div>
             )}
@@ -281,7 +281,7 @@ export function BookingForm() {
             <div className="flex justify-between mt-8">
                 {step > 1 && step < 5 && (
                     <Button type="button" variant="outline" onClick={() => setStep(step - 1)}>
-                        <ArrowLeft className="mr-2 h-4 w-4" /> Go Back
+                        <ArrowLeft className="mr-2 h-4 w-4" /> Vrati se Nazad
                     </Button>
                 )}
                 <div/>
@@ -292,7 +292,7 @@ export function BookingForm() {
                             if (isValid) setStep(step + 1);
                         });
                     }}>
-                        Next Step <ArrowRight className="ml-2 h-4 w-4" />
+                        Sljedeći Korak <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                 )}
             </div>

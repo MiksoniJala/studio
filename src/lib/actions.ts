@@ -27,7 +27,7 @@ export async function getSuggestions(
     console.error('Error getting AI suggestions:', error);
     return {
       alternativeTimes: [],
-      reason: 'We had trouble checking for alternative times. Please try another time or day.',
+      reason: 'Imali smo problema s provjerom alternativnih termina. Molimo pokušajte drugo vrijeme ili dan.',
     };
   }
 }
@@ -45,11 +45,11 @@ export type BookingFormData = z.infer<typeof bookingSchema>;
 export async function createBooking(data: BookingFormData) {
   const result = bookingSchema.safeParse(data);
   if (!result.success) {
-    return { success: false, error: 'Invalid data provided.' };
+    return { success: false, error: 'Dostavljeni podaci su nevažeći.' };
   }
   
   // In a real app, you would save this to a database.
-  console.log('New Booking Created:', result.data);
+  console.log('Nova Rezervacija Kreirana:', result.data);
   
   // We'll simulate success.
   return { success: true };

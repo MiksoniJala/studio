@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -12,9 +13,9 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const SuggestAlternativeTimesInputSchema = z.object({
-  preferredDate: z.string().describe('The preferred date for the appointment (YYYY-MM-DD).'),
-  preferredTime: z.string().describe('The preferred time for the appointment (HH:mm).'),
-  barberName: z.string().describe('The name of the barber.'),
+  preferredDate: z.string().describe('Željeni datum za termin (GGGG-MM-DD).'),
+  preferredTime: z.string().describe('Željeno vrijeme za termin (HH:mm).'),
+  barberName: z.string().describe('Ime barbera.'),
 });
 export type SuggestAlternativeTimesInput = z.infer<
   typeof SuggestAlternativeTimesInputSchema
@@ -23,8 +24,8 @@ export type SuggestAlternativeTimesInput = z.infer<
 const SuggestAlternativeTimesOutputSchema = z.object({
   alternativeTimes: z
     .array(z.string())
-    .describe('An array of suggested alternative time slots (HH:mm).'),
-  reason: z.string().describe('The reason why the original time was unavailable.'),
+    .describe('Niz predloženih alternativnih termina (HH:mm).'),
+  reason: z.string().describe('Razlog zašto originalno vrijeme nije bilo dostupno.'),
 });
 export type SuggestAlternativeTimesOutput = z.infer<
   typeof SuggestAlternativeTimesOutputSchema
@@ -40,16 +41,16 @@ const prompt = ai.definePrompt({
   name: 'suggestAlternativeTimesPrompt',
   input: {schema: SuggestAlternativeTimesInputSchema},
   output: {schema: SuggestAlternativeTimesOutputSchema},
-  prompt: `You are a helpful assistant for a barber shop reservation system.
-When the user's preferred time is unavailable, suggest up to 3 alternative time slots that are close to their initial choice.
-Explain briefly why the original time was unavailable.
+  prompt: `Vi ste koristan asistent za sistem rezervacija u berbernici.
+Kada željeno vrijeme korisnika nije dostupno, predložite do 3 alternativna termina koja su blizu njihovog prvobitnog izbora.
+Ukratko objasnite zašto originalno vrijeme nije bilo dostupno.
 
-Preferred Date: {{{preferredDate}}}
-Preferred Time: {{{preferredTime}}}
-Barber Name: {{{barberName}}}
+Željeni datum: {{{preferredDate}}}
+Željeno vrijeme: {{{preferredTime}}}
+Ime barbera: {{{barberName}}}
 
-Ensure the alternative times are within the same day unless absolutely necessary.
-Format the alternative times as HH:mm.`,
+Osigurajte da su alternativni termini istog dana, osim ako je apsolutno neophodno.
+Formatirajte alternativna vremena kao HH:mm.`,
 });
 
 const suggestAlternativeTimesFlow = ai.defineFlow(

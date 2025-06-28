@@ -1,3 +1,4 @@
+
 import {
   Table,
   TableBody,
@@ -58,17 +59,17 @@ export default function AdminPage() {
     <div className="min-h-screen bg-muted/40 p-4 sm:p-8">
         <div className="max-w-7xl mx-auto">
             <header className="mb-8">
-                <h1 className="text-3xl font-bold font-headline">Admin Dashboard</h1>
-                <p className="text-muted-foreground">View and manage all reservations.</p>
+                <h1 className="text-3xl font-bold font-headline">Admin Kontrolna Tabla</h1>
+                <p className="text-muted-foreground">Pregledajte i upravljajte svim rezervacijama.</p>
             </header>
             <div className="bg-card rounded-lg border shadow-sm">
                 <Table>
                 <TableHeader>
                     <TableRow>
-                    <TableHead>Client Name</TableHead>
-                    <TableHead>Phone</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Time</TableHead>
+                    <TableHead>Ime Klijenta</TableHead>
+                    <TableHead>Telefon</TableHead>
+                    <TableHead>Datum</TableHead>
+                    <TableHead>Vrijeme</TableHead>
                     <TableHead>Barber</TableHead>
                     </TableRow>
                 </TableHeader>

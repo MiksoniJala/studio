@@ -8,7 +8,8 @@ import { z } from 'zod';
 
 export async function getSuggestions(
   preferredDate: string,
-  preferredTime: string
+  preferredTime: string,
+  barberName: string,
 ): Promise<SuggestAlternativeTimesOutput | null> {
   // This is a simplified check. In a real app, this would query a database.
   // We simulate that times ending in ":30" are booked.
@@ -20,7 +21,7 @@ export async function getSuggestions(
     const suggestions = await suggestAlternativeTimes({
       preferredDate,
       preferredTime,
-      barberName: 'any', // Barber is selected in the next step
+      barberName: barberName || 'any',
     });
     return suggestions;
   } catch (error) {

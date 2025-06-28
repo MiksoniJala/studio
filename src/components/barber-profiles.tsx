@@ -1,6 +1,5 @@
 
 import Image from "next/image";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const barbers = [
   {
@@ -17,16 +16,36 @@ const barbers = [
   }
 ];
 
-export function BarberProfiles() {
+interface BarberProfilesProps {
+    onSelectBarber?: (name: string) => void;
+}
+
+export function BarberProfiles({ onSelectBarber }: BarberProfilesProps) {
+  const isSelectable = !!onSelectBarber;
+
   return (
     <section>
-      <div className="text-center mb-12">
-        <h2 className="font-headline text-3xl md:text-4xl font-bold">Upoznajte Naše Barbere</h2>
-        <p className="mt-2 text-lg text-muted-foreground">Majstori iza makaza.</p>
-      </div>
+      {!isSelectable && (
+        <div className="text-center mb-12">
+            <h2 className="font-headline text-3xl md:text-4xl font-bold">Upoznajte Naše Barbere</h2>
+            <p className="mt-2 text-lg text-muted-foreground">Majstori iza makaza.</p>
+        </div>
+      )}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
         {barbers.map((barber) => (
-          <div key={barber.name} className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+          <div 
+            key={barber.name} 
+            className={`flex flex-col sm:flex-row items-center sm:items-start gap-6 p-4 rounded-lg border-2 ${isSelectable ? 'border-transparent hover:border-primary hover:shadow-2xl hover:scale-105 cursor-pointer transform transition-all duration-300' : 'border-none'}`}
+            onClick={() => onSelectBarber?.(barber.name)}
+            role={isSelectable ? 'button' : undefined}
+            tabIndex={isSelectable ? 0 : -1}
+            onKeyDown={(e) => {
+                if(isSelectable && (e.key === 'Enter' || e.key === ' ')) {
+                    e.preventDefault();
+                    onSelectBarber(barber.name);
+                }
+            }}
+          >
             <div className="flex-shrink-0">
                 <Image 
                     src={barber.image}

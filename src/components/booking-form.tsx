@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -38,16 +38,13 @@ const timeSlots = Array.from({ length: 16 }, (_, i) => {
     return `${String(hour).padStart(2, '0')}:${minute}`;
 });
 
-const barbers = [
-    { name: "Mirsad", id: "mirsad", image: "https://placehold.co/200x200.png", hint: "male portrait" },
-    { name: "Huske", id: "huske", image: "https://placehold.co/200x200.png", hint: "male portrait" },
-]
-
-export function BookingForm() {
+export function BookingForm({ barber }: { barber: string | null }) {
   const [step, setStep] = useState(1);
   const [isPending, startTransition] = useTransition();
   const [suggestions, setSuggestions] = useState<SuggestAlternativeTimesOutput | null>(null);
   const { toast } = useToast();
+  
+  const barberDisplayName = barber === 'Mirsad' ? 'Mirsada' : (barber === 'Huske' ? 'Husketa' : '');
 
   const form = useForm<z.infer<typeof bookingSchema>>({
     resolver: zodResolver(bookingSchema),
@@ -55,15 +52,23 @@ export function BookingForm() {
       date: new Date(),
       name: "",
       phone: "",
+      barber: barber || undefined,
     },
   });
+
+  useEffect(() => {
+    if (barber) {
+        form.setValue('barber', barber as "Mirsad" | "Huske");
+    }
+  }, [barber, form]);
 
   const handleTimeSelect = (time: string) => {
     form.setValue("time", time);
     setSuggestions(null);
     startTransition(async () => {
       const date = form.getValues("date");
-      const result = await getSuggestions(format(date, "yyyy-MM-dd"), time);
+      const barberName = form.getValues("barber");
+      const result = await getSuggestions(format(date, "yyyy-MM-dd"), time, barberName);
       if (result) {
         setSuggestions(result);
       } else {
@@ -80,7 +85,7 @@ export function BookingForm() {
         }
         const result = await createBooking(bookingData);
         if (result.success) {
-            setStep(5);
+            setStep(4);
         } else {
             toast({
                 variant: "destructive",
@@ -94,15 +99,16 @@ export function BookingForm() {
   return (
     <Card className="w-full max-w-3xl mx-auto shadow-2xl">
       <CardHeader>
-        <CardTitle className="font-headline text-3xl">Rezervišite Svoj Termin</CardTitle>
+        <CardTitle className="font-headline text-3xl">
+          Rezervišite Svoj Termin kod {barberDisplayName}
+        </CardTitle>
         <CardDescription>
-            {step < 5 && `Korak ${step} od 4 - ${
+            {step < 4 && `Korak ${step} od 3 - ${
                 step === 1 ? "Odaberite Datum i Vrijeme" : 
-                step === 2 ? "Odaberite Svog Barbera" :
-                step === 3 ? "Vaše Informacije" :
+                step === 2 ? "Vaše Informacije" :
                 "Potvrdite Vašu Rezervaciju"
             }`}
-            {step === 5 && "Rezervacija Potvrđena!"}
+            {step === 4 && "Rezervacija Potvrđena!"}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -185,41 +191,6 @@ export function BookingForm() {
             )}
 
             {step === 2 && (
-              <FormField
-                control={form.control}
-                name="barber"
-                render={({ field }) => (
-                    <FormItem className="space-y-3">
-                    <FormLabel className="text-xl font-headline">Odaberite svog majstora</FormLabel>
-                    <FormControl>
-                      <RadioGroup
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2"
-                      >
-                        {barbers.map(barber => (
-                            <FormItem key={barber.id}>
-                                <FormControl>
-                                <RadioGroupItem value={barber.name} className="sr-only" />
-                                </FormControl>
-                                <FormLabel className={cn(
-                                    "flex flex-col items-center justify-center rounded-lg border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer transition-all",
-                                    field.value === barber.name && "border-primary"
-                                )}>
-                                    <Image src={barber.image} alt={barber.name} width={80} height={80} className="rounded-full mb-4" data-ai-hint={barber.hint} />
-                                    <span className="font-bold text-lg font-headline">{barber.name}</span>
-                                </FormLabel>
-                            </FormItem>
-                        ))}
-                      </RadioGroup>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-
-            {step === 3 && (
               <div className="space-y-4 max-w-sm mx-auto">
                 <FormField
                   control={form.control}
@@ -250,7 +221,7 @@ export function BookingForm() {
               </div>
             )}
             
-            {step === 4 && (
+            {step === 3 && (
                 <div className="space-y-6 text-center">
                     <h3 className="font-headline text-2xl">Potvrdite Vašu Rezervaciju</h3>
                     <Card className="text-left max-w-md mx-auto">
@@ -269,7 +240,7 @@ export function BookingForm() {
                 </div>
             )}
 
-            {step === 5 && (
+            {step === 4 && (
                 <div className="text-center py-10">
                     <PartyPopper className="w-16 h-16 mx-auto text-primary" />
                     <h3 className="font-headline text-2xl mt-4">Sve je spremno!</h3>
@@ -281,16 +252,15 @@ export function BookingForm() {
             )}
 
             <div className="flex justify-between mt-8">
-                {step > 1 && step < 5 && (
+                {step > 1 && step < 4 && (
                     <Button type="button" variant="outline" onClick={() => setStep(step - 1)}>
                         <ArrowLeft className="mr-2 h-4 w-4" /> Vrati se Nazad
                     </Button>
                 )}
                 <div/>
-                {step > 1 && step < 4 && (
+                {step === 2 && (
                     <Button type="button" onClick={() => {
-                        const fieldsToValidate: ("barber" | "name" | "phone")[] = step === 2 ? ["barber"] : ["name", "phone"];
-                        form.trigger(fieldsToValidate).then(isValid => {
+                        form.trigger(["name", "phone"]).then(isValid => {
                             if (isValid) setStep(step + 1);
                         });
                     }}>

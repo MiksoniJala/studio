@@ -17,10 +17,22 @@ const bookingSchema = z.object({
 
 export type BookingFormData = z.infer<typeof bookingSchema>;
 
-// Simple in-memory "database" for demonstration purposes.
-// This will be cleared on server restart.
-const bookings: (BookingFormData & { id: number })[] = [];
-let lastBookingId = 0;
+// This is a workaround for preserving in-memory state in a development environment
+// with hot-reloading. In a production app, you would use a proper database.
+const globalForDb = globalThis as unknown as {
+  bookings: (BookingFormData & { id: number })[];
+  lastBookingId: number;
+};
+
+// Initialize the in-memory "database" if it doesn't exist on the global object
+if (!globalForDb.bookings) {
+  globalForDb.bookings = [];
+}
+if (globalForDb.lastBookingId === undefined) {
+  globalForDb.lastBookingId = 0;
+}
+
+const bookings = globalForDb.bookings;
 
 
 export async function getSuggestions(
@@ -93,8 +105,8 @@ export async function createBooking(data: BookingFormData) {
     return { success: false, error: 'Žao nam je, ovaj termin je upravo zauzet. Molimo izaberite drugi.' };
   }
 
-  lastBookingId++;
-  const newBooking = { ...result.data, id: lastBookingId };
+  globalForDb.lastBookingId++;
+  const newBooking = { ...result.data, id: globalForDb.lastBookingId };
   bookings.push(newBooking);
   
   console.log('Nova Rezervacija Kreirana:', newBooking);

@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
+import { isSameDay, parseISO } from 'date-fns';
 
 // --- DATA TYPES ---
 
@@ -33,16 +34,15 @@ export interface Work {
 
 // --- IN-MEMORY DATABASE ---
 
-// This is a workaround for preserving in-memory state in a development environment
-// with hot-reloading. In a production app, you would use a proper database.
 const globalForDb = globalThis as unknown as {
   bookings: (BookingFormData & { id: number })[];
   lastBookingId: number;
   barbers: Barber[];
   works: Work[];
+  nonWorkingDays: Date[];
 };
 
-// Initialize the in-memory "database" if it doesn't exist
+// Initialize the in-memory "database" 
 if (!globalForDb.bookings) globalForDb.bookings = [];
 if (globalForDb.lastBookingId === undefined) globalForDb.lastBookingId = 0;
 
@@ -50,13 +50,13 @@ if (!globalForDb.barbers) {
   globalForDb.barbers = [
     {
       name: "Miki",
-      description: "Specijalizovan za klasične fade frizure, precizno oblikovanje brade i frizure inspirisane tattoo art stilom. Sa svojih 18 godina, Miki donosi svježinu i kreativnost u svaki rez, kombinujući moderno s klasičnim tehnikama. Njegova preciznost, osjećaj za detalje i posvećenost klijentima čine ga savršenim izborom za one koji žele upečatljiv i besprijekoran izgled.",
+      description: "Specijalista za klasične fade frizure i precizno oblikovanje brade. Miki donosi svježinu i kreativnost u svaki rez, kombinujući moderno s klasičnim.",
       image: "https://placehold.co/400x400.png",
       hint: "classic barber portrait"
     },
     {
       name: "Huske",
-      description: "Mladi i perspektivni frizer na praksi, poznat po velikoj želji za učenjem i istraživanjem novih trendova. Huske sa strašću prati moderne tehnike šišanja i stylinga, ne boji se eksperimentisati i uvijek je spreman ponuditi klijentima svježe, originalne ideje. Njegov entuzijazam, kreativnost i pristupačnost čine ga odličnim izborom za svakoga ko želi isprobati nešto novo i moderno.",
+      description: "Mladi frizer na praksi sa strašću za praćenje modernih tehnika i trendova. Huske je odličan izbor za svakoga ko želi isprobati nešto novo i moderno.",
       image: "https://placehold.co/400x400.png",
       hint: "modern barber portrait"
     }
@@ -72,6 +72,13 @@ if (!globalForDb.works) {
     { src: "https://placehold.co/600x400.png", alt: "Usluga brijanja vrućim peškirom", hint: "hot towel" },
   ];
 }
+if (!globalForDb.nonWorkingDays) {
+    globalForDb.nonWorkingDays = [
+        new Date(2025, 0, 1), // New Year
+        new Date(2025, 4, 1), // Labor Day
+    ]
+}
+
 
 // --- AUTH ACTIONS ---
 
@@ -117,6 +124,12 @@ export async function createBooking(data: BookingFormData) {
     return { success: false, error: 'Dostavljeni podaci su nevažeći.' };
   }
   
+  const bookingDate = parseISO(result.data.date);
+  const isNonWorking = globalForDb.nonWorkingDays.some(d => isSameDay(d, bookingDate));
+  if (isNonWorking) {
+    return { success: false, error: 'Odabrani datum je neradni dan.' };
+  }
+
   const isSlotTaken = globalForDb.bookings.some(
     booking =>
       booking.date === result.data.date &&
@@ -133,6 +146,7 @@ export async function createBooking(data: BookingFormData) {
   globalForDb.bookings.push(newBooking);
   
   revalidatePath('/admin');
+  revalidatePath('/');
   
   return { success: true };
 }
@@ -169,6 +183,7 @@ export async function addImage(formData: FormData) {
     if (result.success) {
         globalForDb.works.unshift(result.data);
         revalidatePath('/admin/gallery');
+        revalidatePath('/');
     }
 }
 
@@ -182,5 +197,39 @@ export async function removeImage(formData: FormData) {
     if (result.success) {
         globalForDb.works.splice(result.data.index, 1);
         revalidatePath('/admin/gallery');
+        revalidatePath('/');
     }
+}
+
+
+// --- SETTINGS ACTIONS ---
+
+export async function getNonWorkingDays(): Promise<Date[]> {
+    return globalForDb.nonWorkingDays;
+}
+
+export async function addNonWorkingDay(formData: FormData) {
+    const dateStr = formData.get('date') as string;
+    if (!dateStr) return;
+    
+    const date = parseISO(dateStr);
+    
+    if (!globalForDb.nonWorkingDays.some(d => isSameDay(d, date))) {
+        globalForDb.nonWorkingDays.push(date);
+        globalForDb.nonWorkingDays.sort((a, b) => a.getTime() - b.getTime());
+        revalidatePath('/admin/settings');
+        revalidatePath('/');
+    }
+}
+
+export async function removeNonWorkingDay(formData: FormData) {
+    const dateStr = formData.get('date') as string;
+     if (!dateStr) return;
+
+    const dateToRemove = parseISO(dateStr);
+    globalForDb.nonWorkingDays = globalForDb.nonWorkingDays.filter(
+        d => !isSameDay(d, dateToRemove)
+    );
+    revalidatePath('/admin/settings');
+    revalidatePath('/');
 }

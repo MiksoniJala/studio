@@ -15,9 +15,10 @@ import type { Barber, Work } from '@/lib/actions';
 interface HomePageClientProps {
   barbers: Barber[];
   works: Work[];
+  nonWorkingDays: string[];
 }
 
-export function HomePageClient({ barbers, works }: HomePageClientProps) {
+export function HomePageClient({ barbers, works, nonWorkingDays }: HomePageClientProps) {
   const [selectedBarber, setSelectedBarber] = useState<string | null>(null);
   const bookingRef = useRef<HTMLDivElement>(null);
 
@@ -102,7 +103,7 @@ export function HomePageClient({ barbers, works }: HomePageClientProps) {
                   animate={{height: 'auto', opacity: 1}}
                   transition={{duration: 0.7, ease: "easeOut"}}
               >
-                  <BookingForm barber={selectedBarber} />
+                  <BookingForm barber={selectedBarber} nonWorkingDays={nonWorkingDays} />
               </motion.div>
           )}
         </div>

@@ -1,13 +1,12 @@
 
 "use client";
 
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { format } from "date-fns";
+import { format, isToday, parseISO } from "date-fns";
 import { bs } from "date-fns/locale";
-import Image from "next/image";
 import { Calendar as CalendarIcon, Clock, User, Phone, Scissors, Loader2, PartyPopper, ArrowRight, ArrowLeft } from "lucide-react";
 import type { VariantProps } from "class-variance-authority";
 
@@ -31,13 +30,13 @@ const bookingSchema = z.object({
   phone: z.string().min(5, "Molimo unesite važeći broj telefona."),
 });
 
-const timeSlots = Array.from({ length: 16 }, (_, i) => {
+const allTimeSlots = Array.from({ length: 16 }, (_, i) => {
     const hour = Math.floor(i / 2) + 8;
     const minute = i % 2 === 0 ? "00" : "30";
     return `${String(hour).padStart(2, '0')}:${minute}`;
 });
 
-export function BookingForm({ barber }: { barber: string | null }) {
+export function BookingForm({ barber, nonWorkingDays }: { barber: string | null, nonWorkingDays: string[] }) {
   const [step, setStep] = useState(1);
   const [isPending, startTransition] = useTransition();
   const [bookedSlots, setBookedSlots] = useState<string[]>([]);
@@ -49,7 +48,6 @@ export function BookingForm({ barber }: { barber: string | null }) {
   const form = useForm<z.infer<typeof bookingSchema>>({
     resolver: zodResolver(bookingSchema),
     defaultValues: {
-      date: new Date(),
       name: "",
       phone: "",
       barber: barber || undefined,
@@ -57,6 +55,19 @@ export function BookingForm({ barber }: { barber: string | null }) {
   });
 
   const selectedDate = form.watch('date');
+
+  const disabledDates = useMemo(() => {
+    return nonWorkingDays.map(d => parseISO(d));
+  }, [nonWorkingDays]);
+
+  const timeSlots = useMemo(() => {
+    if (!selectedDate || !isToday(selectedDate)) {
+        return allTimeSlots;
+    }
+    const now = new Date();
+    const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    return allTimeSlots.filter(slot => slot > currentTime);
+  }, [selectedDate]);
 
   useEffect(() => {
     if (barber && selectedDate) {
@@ -147,7 +158,7 @@ export function BookingForm({ barber }: { barber: string | null }) {
                                 field.onChange(date);
                                 form.setValue("time", ""); // Reset time on date change
                             }}
-                            disabled={(date) => date < new Date(new Date().setDate(new Date().getDate() - 1))}
+                            disabled={[...disabledDates, {before: new Date(new Date().setDate(new Date().getDate() - 1))}]}
                             initialFocus
                             locale={bs}
                           />
@@ -250,7 +261,7 @@ export function BookingForm({ barber }: { barber: string | null }) {
                     <h3 className="font-headline text-2xl mt-4">Sve je spremno!</h3>
                     <p className="text-muted-foreground mt-2">Vaš termin je potvrđen. Radujemo se vašem dolasku.</p>
                     <div className="mt-6">
-                        <Button variant="outline" onClick={() => { form.reset(); setStep(1); }}>Rezerviši Novi Termin</Button>
+                        <Button variant="outline" onClick={() => { form.reset({barber: barber || undefined}); setStep(1); }}>Rezerviši Novi Termin</Button>
                     </div>
                 </div>
             )}

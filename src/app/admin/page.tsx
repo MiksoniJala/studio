@@ -8,8 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { getBookings, deleteBooking } from "@/lib/actions";
-import { Button } from "@/components/ui/button";
+import { getBookings } from "@/lib/actions";
 import { AlertTriangle } from "lucide-react";
 import {
   Tooltip,
@@ -17,6 +16,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { DeleteBookingButton } from "@/components/delete-booking-button";
 
 
 export default async function AdminPage({
@@ -73,12 +73,7 @@ export default async function AdminPage({
                             <TableCell><Badge variant={res.barber === 'Miki' ? 'default' : 'secondary'}>{res.barber}</Badge></TableCell>
                             <TableCell className="text-muted-foreground">{res.ipAddress ?? 'N/A'}</TableCell>
                             <TableCell className="text-right">
-                                <form action={deleteBooking}>
-                                    <input type="hidden" name="id" value={res.id} />
-                                    <Button variant="destructive" size="sm" type="submit">
-                                        Obriši
-                                    </Button>
-                                </form>
+                                <DeleteBookingButton bookingId={res.id} />
                             </TableCell>
                         </TableRow>
                         ))

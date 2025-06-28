@@ -9,19 +9,19 @@ export default function Home() {
       <main className="flex-grow container mx-auto px-4 py-8 md:py-12">
         <header className="text-center mb-12">
           <div className="mb-4">
-            <svg
-              width="100"
-              height="100"
-              viewBox="0 0 100 100"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="mx-auto"
-            >
-              <circle cx="50" cy="50" r="48" fill="hsl(var(--card))" stroke="hsl(var(--primary))" strokeWidth="3" />
-              <path d="M42,35a5,5 0 1 0-10,0a5,5 0 0 0 10,0" fill="hsl(var(--primary))" />
-              <path d="M68,35a5,5 0 1 0-10,0a5,5 0 0 0 10,0" fill="hsl(var(--primary))" />
-              <path d="M68,42 L42,68" stroke="hsl(var(--primary))" strokeWidth="3" strokeLinecap="round" />
-              <path d="M42,42 L68,68" stroke="hsl(var(--primary))" strokeWidth="3" strokeLinecap="round" />
+            <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="mx-auto">
+                <circle cx="60" cy="60" r="58" fill="hsl(var(--card))" stroke="hsl(var(--primary))" strokeWidth="3"/>
+                <g transform="translate(32 20) scale(0.9)">
+                    <path d="M22 17C22 12.5817 25.5817 9 30 9C34.4183 9 38 12.5817 38 17" stroke="hsl(var(--primary))" strokeWidth="3.5" strokeLinecap="round"/>
+                    <path d="M46 17C46 12.5817 49.5817 9 54 9C58.4183 9 62 12.5817 62 17" stroke="hsl(var(--primary))" strokeWidth="3.5" strokeLinecap="round"/>
+                    <path d="M30,17 L54,41" stroke="hsl(var(--primary))" strokeWidth="4" strokeLinecap="round"/>
+                    <path d="M54,17 L30,41" stroke="hsl(var(--primary))" strokeWidth="4" strokeLinecap="round"/>
+                    <path d="M30 41L20 65" stroke="hsl(var(--primary))" strokeWidth="4" strokeLinecap="round"/>
+                    <path d="M54 41L64 65" stroke="hsl(var(--primary))" strokeWidth="4" strokeLinecap="round"/>
+                </g>
+                <text x="60" y="95" fontFamily="Playfair Display, serif" fontSize="20" fill="hsl(var(--primary))" textAnchor="middle" fontWeight="bold">
+                    Miki Barber
+                </text>
             </svg>
           </div>
           <h1 className="font-headline text-4xl md:text-6xl font-bold tracking-tight">

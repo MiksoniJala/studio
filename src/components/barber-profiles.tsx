@@ -56,8 +56,6 @@ export function BarberProfiles({ onSelectBarber }: BarberProfilesProps) {
       <motion.div 
         className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12"
         variants={containerVariants}
-        initial="hidden"
-        animate="visible"
       >
         {barbers.map((barber) => (
           <motion.div 

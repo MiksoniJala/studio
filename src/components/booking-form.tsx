@@ -159,7 +159,7 @@ export function BookingForm({ barber, nonWorkingDays }: { barber: string | null,
                                 field.onChange(date);
                                 form.setValue("time", ""); // Reset time on date change
                             }}
-                            disabled={[...disabledDates, { dayOfWeek: 0 }, {before: new Date(new Date().setDate(new Date().getDate() - 1))}]}
+                            disabled={[...disabledDates, { dayOfWeek: [0] }, {before: new Date(new Date().setDate(new Date().getDate() - 1))}]}
                             initialFocus
                             locale={bs}
                           />

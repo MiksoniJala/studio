@@ -19,12 +19,28 @@ export async function getSuggestions(
   if (!isMirsadBusy && !isHuskeBusy) {
     return null;
   }
+
+  const allTimeSlots = Array.from({ length: 16 }, (_, i) => {
+    const hour = Math.floor(i / 2) + 8;
+    const minute = i % 2 === 0 ? "00" : "30";
+    return `${String(hour).padStart(2, '0')}:${minute}`;
+  });
+
+  let availableSlots: string[];
+  if (barberName === 'Mirsad') {
+    availableSlots = allTimeSlots.filter(time => time.endsWith(':00'));
+  } else if (barberName === 'Huske') {
+    availableSlots = allTimeSlots.filter(time => time.endsWith(':30'));
+  } else {
+    availableSlots = allTimeSlots;
+  }
   
   try {
     const suggestions = await suggestAlternativeTimes({
       preferredDate,
       preferredTime,
       barberName: barberName || 'any',
+      availableSlots,
     });
     return suggestions;
   } catch (error) {

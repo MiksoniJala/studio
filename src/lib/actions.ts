@@ -18,6 +18,7 @@ import {
   Timestamp
 } from 'firebase/firestore';
 import { ref, uploadString, getDownloadURL, deleteObject } from 'firebase/storage';
+import { headers } from 'next/headers';
 
 
 // --- DATA TYPES ---
@@ -28,9 +29,15 @@ const bookingSchema = z.object({
   barber: z.string().min(1, 'Please select a barber'),
   name: z.string().min(1, 'Name is required'),
   phone: z.string().min(1, 'Phone number is required'),
+  ipAddress: z.string().optional(),
+  isFlagged: z.boolean().optional(),
 });
 
 export type BookingFormData = z.infer<typeof bookingSchema>;
+
+export interface Booking extends BookingFormData {
+    id: string;
+}
 
 export interface Barber {
     id: string;
@@ -93,10 +100,36 @@ export async function createBooking(data: BookingFormData) {
   if (bookedSlots.includes(result.data.time)) {
     return { success: false, error: 'Žao nam je, ovaj termin je upravo zauzet. Molimo izaberite drugi.' };
   }
+
+  const ip = headers().get('x-forwarded-for') ?? 'Nije dostupna';
+  
+  let isFlagged = false;
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const q = query(
+        collection(db, 'bookings'),
+        where('phone', '==', result.data.phone)
+    );
+    const querySnapshot = await getDocs(q);
+    const existingFutureBookings = querySnapshot.docs.filter(doc => {
+        const d = parseISO(doc.data().date);
+        return d >= today;
+    });
+
+    if (existingFutureBookings.length > 0) {
+        isFlagged = true;
+    }
+  } catch (error) {
+    console.error("Error checking for multiple bookings:", error);
+  }
   
   try {
     await addDoc(collection(db, 'bookings'), {
       ...result.data,
+      ipAddress: ip,
+      isFlagged: isFlagged,
       createdAt: serverTimestamp(),
     });
 
@@ -110,11 +143,11 @@ export async function createBooking(data: BookingFormData) {
   }
 }
 
-export async function getBookings() {
+export async function getBookings(): Promise<Booking[]> {
    try {
     const q = query(collection(db, 'bookings'), orderBy('createdAt', 'desc'));
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as (BookingFormData & {id: string})[];
+    return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as Booking[];
   } catch (error) {
     console.error("Error fetching bookings: ", error);
     return [];

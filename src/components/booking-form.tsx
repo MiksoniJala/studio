@@ -61,7 +61,8 @@ export function BookingForm({ barber, nonWorkingDays }: { barber: string | null,
   }, [nonWorkingDays]);
 
   const timeSlots = useMemo(() => {
-    if (!selectedDate || !isToday(selectedDate)) {
+    if (!selectedDate) return [];
+    if (!isToday(selectedDate)) {
         return allTimeSlots;
     }
     const now = new Date();
@@ -158,7 +159,7 @@ export function BookingForm({ barber, nonWorkingDays }: { barber: string | null,
                                 field.onChange(date);
                                 form.setValue("time", ""); // Reset time on date change
                             }}
-                            disabled={[...disabledDates, {before: new Date(new Date().setDate(new Date().getDate() - 1))}]}
+                            disabled={[...disabledDates, { dayOfWeek: 0 }, {before: new Date(new Date().setDate(new Date().getDate() - 1))}]}
                             initialFocus
                             locale={bs}
                           />
@@ -169,7 +170,7 @@ export function BookingForm({ barber, nonWorkingDays }: { barber: string | null,
                   )}
                 />
                 
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+                {selectedDate && <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
                   {isLoadingSlots
                     ? Array.from({ length: 16 }).map((_, i) => (
                         <Skeleton key={i} className="h-10" />
@@ -201,7 +202,7 @@ export function BookingForm({ barber, nonWorkingDays }: { barber: string | null,
                           </Button>
                         );
                       })}
-                </div>
+                </div>}
               </div>
             )}
 

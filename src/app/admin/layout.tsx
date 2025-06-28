@@ -22,8 +22,10 @@ import {
 
 export default function AdminLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: { [key: string]: string | string[] | undefined };
 }) {
   return (
     <SidebarProvider>

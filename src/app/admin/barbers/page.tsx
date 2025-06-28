@@ -15,18 +15,24 @@ const barbers = [
   {
     name: "Mirsad",
     description: "Sa preko 15 godina iskustva, Mirsad je majstor klasičnih frizura i modernih stilova.",
-    image: "https://placehold.co/400x400.png",
+    image: "/logo.png",
     hint: "classic barber portrait"
   },
   {
     name: "Huske",
     description: "Huske donosi svjež, umjetnički pristup berberskom zanatu. Specijalizirao se za kreativne fadeove.",
-    image: "https://placehold.co/400x400.png",
+    image: "/logo.png",
     hint: "modern barber portrait"
   }
 ];
 
-export default function BarbersAdminPage() {
+export default function BarbersAdminPage({
+    params,
+    searchParams,
+}: {
+    params: { [key:string]: string | string[] | undefined };
+    searchParams: { [key: string]: string | string[] | undefined };
+}) {
     return (
         <Card>
             <CardHeader>

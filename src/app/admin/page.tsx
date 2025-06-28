@@ -53,7 +53,13 @@ const mockReservations = [
 ];
 
 
-export default function AdminPage() {
+export default function AdminPage({
+    params,
+    searchParams,
+}: {
+    params: { [key: string]: string | string[] | undefined };
+    searchParams: { [key: string]: string | string[] | undefined };
+}) {
   return (
     <div className="flex flex-col gap-8">
         <div>

@@ -56,11 +56,11 @@ export default function AdminLoginPage() {
             )}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" name="email" type="email" placeholder="admin@primjer.com" defaultValue="admin@primjer.com" required />
+              <Input id="email" name="email" type="email" placeholder="admin@primjer.com" required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Lozinka</Label>
-              <Input id="password" name="password" type="password" defaultValue="ryze2025" required />
+              <Input id="password" name="password" type="password" placeholder="••••••••" required />
             </div>
           </CardContent>
           <CardFooter>

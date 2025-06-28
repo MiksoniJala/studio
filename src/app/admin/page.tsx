@@ -8,17 +8,18 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
+import { getBookings } from "@/lib/actions";
 
-const mockReservations: any[] = [];
 
-
-export default function AdminPage({
+export default async function AdminPage({
     params,
     searchParams,
 }: {
     params: { [key: string]: string | string[] | undefined };
     searchParams: { [key: string]: string | string[] | undefined };
 }) {
+  const reservations = await getBookings();
+
   return (
     <div className="flex flex-col gap-8">
         <div>
@@ -37,8 +38,8 @@ export default function AdminPage({
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {mockReservations.length > 0 ? (
-                    mockReservations.map((res) => (
+                {reservations.length > 0 ? (
+                    reservations.map((res) => (
                     <TableRow key={res.id}>
                         <TableCell className="font-medium">{res.name}</TableCell>
                         <TableCell>{res.phone}</TableCell>

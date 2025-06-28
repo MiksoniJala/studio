@@ -5,6 +5,23 @@ import { redirect } from 'next/navigation';
 import { suggestAlternativeTimes } from '@/ai/flows/suggest-alternative-times';
 import type { SuggestAlternativeTimesOutput } from '@/ai/flows/suggest-alternative-times';
 import { z } from 'zod';
+import { revalidatePath } from 'next/cache';
+
+const bookingSchema = z.object({
+  date: z.string().min(1, 'Date is required'),
+  time: z.string().min(1, 'Time is required'),
+  barber: z.string().min(1, 'Please select a barber'),
+  name: z.string().min(1, 'Name is required'),
+  phone: z.string().min(1, 'Phone number is required'),
+});
+
+export type BookingFormData = z.infer<typeof bookingSchema>;
+
+// Simple in-memory "database" for demonstration purposes.
+// This will be cleared on server restart.
+const bookings: (BookingFormData & { id: number })[] = [];
+let lastBookingId = 0;
+
 
 export async function getSuggestions(
   preferredDate: string,
@@ -52,27 +69,28 @@ export async function getSuggestions(
   }
 }
 
-const bookingSchema = z.object({
-  date: z.string().min(1, 'Date is required'),
-  time: z.string().min(1, 'Time is required'),
-  barber: z.string().min(1, 'Please select a barber'),
-  name: z.string().min(1, 'Name is required'),
-  phone: z.string().min(1, 'Phone number is required'),
-});
-
-export type BookingFormData = z.infer<typeof bookingSchema>;
-
 export async function createBooking(data: BookingFormData) {
   const result = bookingSchema.safeParse(data);
   if (!result.success) {
     return { success: false, error: 'Dostavljeni podaci su nevažeći.' };
   }
   
-  // In a real app, you would save this to a database.
-  console.log('Nova Rezervacija Kreirana:', result.data);
+  lastBookingId++;
+  const newBooking = { ...result.data, id: lastBookingId };
+  bookings.push(newBooking);
   
-  // We'll simulate success.
+  console.log('Nova Rezervacija Kreirana:', newBooking);
+
+  // Revalidate the admin page to show the new booking
+  revalidatePath('/admin');
+  
   return { success: true };
+}
+
+export async function getBookings() {
+  // In a real app, you would fetch from a database.
+  // We return a sorted list of bookings, newest first.
+  return [...bookings].sort((a, b) => b.id - a.id);
 }
 
 export type LoginState = {

@@ -24,12 +24,12 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <main className="flex-grow container mx-auto px-4 py-8 md:py-12">
+    <div className="flex flex-col min-h-screen bg-background text-foreground">
+      <main className="flex-grow container mx-auto px-4 py-8 md:py-12 overflow-x-hidden">
         
-        <div className="relative">
+        <div className="relative min-h-[700px]">
           {/* Barber Selection View */}
-          <div className={`transition-opacity duration-500 ease-in-out ${selectedBarber ? 'opacity-0 pointer-events-none absolute w-full' : 'opacity-100'}`}>
+          <div className={`transition-all duration-500 ease-in-out ${selectedBarber ? 'opacity-0 -translate-y-4 pointer-events-none absolute w-full' : 'opacity-100 translate-y-0'}`}>
             <header className="text-center mb-12">
               <div className="mb-4">
                  <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="mx-auto">
@@ -58,7 +58,7 @@ export default function Home() {
           </div>
 
           {/* Booking View */}
-          <div className={`transition-all duration-500 ease-in-out ${selectedBarber ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+          <div className={`transition-all duration-500 ease-in-out ${selectedBarber ? 'opacity-100 translate-y-0 delay-200' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
              {selectedBarber && (
               <>
                 <Button variant="ghost" onClick={handleGoBack} className="mb-4 -ml-4">

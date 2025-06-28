@@ -121,6 +121,19 @@ export async function getBookings() {
   }
 }
 
+export async function deleteBooking(formData: FormData) {
+    const id = formData.get('id') as string;
+    if (!id) return;
+
+    try {
+        await deleteDoc(doc(db, 'bookings', id));
+        revalidatePath('/admin');
+    } catch (error) {
+        console.error("Error deleting booking: ", error);
+        // Optionally, return an error to be displayed in the UI
+    }
+}
+
 // --- BARBER ACTIONS ---
 
 export async function getBarbers(): Promise<Barber[]> {

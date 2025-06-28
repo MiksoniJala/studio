@@ -8,7 +8,8 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { getBookings } from "@/lib/actions";
+import { getBookings, deleteBooking } from "@/lib/actions";
+import { Button } from "@/components/ui/button";
 
 
 export default async function AdminPage({
@@ -24,7 +25,7 @@ export default async function AdminPage({
     <div className="flex flex-col gap-8">
         <div>
             <h1 className="text-3xl font-bold font-headline">Pregled Rezervacija</h1>
-            <p className="text-muted-foreground">Ovdje možete vidjeti sve nadolazeće i prošle rezervacije.</p>
+            <p className="text-muted-foreground">Ovdje možete vidjeti i obrisati sve rezervacije.</p>
         </div>
         <div className="bg-card rounded-lg border shadow-sm">
             <Table>
@@ -35,6 +36,7 @@ export default async function AdminPage({
                 <TableHead>Datum</TableHead>
                 <TableHead>Vrijeme</TableHead>
                 <TableHead>Barber</TableHead>
+                <TableHead className="text-right">Akcije</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
@@ -46,11 +48,19 @@ export default async function AdminPage({
                         <TableCell>{res.date}</TableCell>
                         <TableCell>{res.time}</TableCell>
                         <TableCell><Badge variant={res.barber === 'Miki' ? 'default' : 'secondary'}>{res.barber}</Badge></TableCell>
+                        <TableCell className="text-right">
+                            <form action={deleteBooking}>
+                                <input type="hidden" name="id" value={res.id} />
+                                <Button variant="destructive" size="sm" type="submit">
+                                    Obriši
+                                </Button>
+                            </form>
+                        </TableCell>
                     </TableRow>
                     ))
                 ) : (
                     <TableRow>
-                        <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                        <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
                             Trenutno nema rezervacija.
                         </TableCell>
                     </TableRow>

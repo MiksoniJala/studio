@@ -9,48 +9,7 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 
-const mockReservations = [
-  {
-    id: "1",
-    name: "John Doe",
-    phone: "555-123-4567",
-    date: "2024-08-15",
-    time: "10:00",
-    barber: "Miki",
-  },
-  {
-    id: "2",
-    name: "Peter Jones",
-    phone: "555-987-6543",
-    date: "2024-08-15",
-    time: "11:00",
-    barber: "Huske",
-  },
-    {
-    id: "3",
-    name: "Sam Wilson",
-    phone: "555-456-7890",
-    date: "2024-08-15",
-    time: "14:00",
-    barber: "Miki",
-  },
-  {
-    id: "4",
-    name: "Michael Chen",
-    phone: "555-789-0123",
-    date: "2024-08-16",
-    time: "09:00",
-    barber: "Huske",
-  },
-    {
-    id: "5",
-    name: "David Garcia",
-    phone: "555-234-5678",
-    date: "2024-08-16",
-    time: "10:30",
-    barber: "Huske",
-  },
-];
+const mockReservations: any[] = [];
 
 
 export default function AdminPage({
@@ -78,15 +37,23 @@ export default function AdminPage({
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {mockReservations.map((res) => (
-                <TableRow key={res.id}>
-                    <TableCell className="font-medium">{res.name}</TableCell>
-                    <TableCell>{res.phone}</TableCell>
-                    <TableCell>{res.date}</TableCell>
-                    <TableCell>{res.time}</TableCell>
-                    <TableCell><Badge variant={res.barber === 'Miki' ? 'default' : 'secondary'}>{res.barber}</Badge></TableCell>
-                </TableRow>
-                ))}
+                {mockReservations.length > 0 ? (
+                    mockReservations.map((res) => (
+                    <TableRow key={res.id}>
+                        <TableCell className="font-medium">{res.name}</TableCell>
+                        <TableCell>{res.phone}</TableCell>
+                        <TableCell>{res.date}</TableCell>
+                        <TableCell>{res.time}</TableCell>
+                        <TableCell><Badge variant={res.barber === 'Miki' ? 'default' : 'secondary'}>{res.barber}</Badge></TableCell>
+                    </TableRow>
+                    ))
+                ) : (
+                    <TableRow>
+                        <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                            Trenutno nema rezervacija.
+                        </TableCell>
+                    </TableRow>
+                )}
             </TableBody>
             </Table>
         </div>

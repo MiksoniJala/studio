@@ -1,6 +1,5 @@
 
 import Link from "next/link";
-import Image from "next/image";
 import {
   Calendar,
   Home,
@@ -30,13 +29,11 @@ export default function AdminLayout({
       <Sidebar>
         <SidebarHeader>
           <div className="flex items-center gap-2 p-2">
-             <Image 
-                src="data:image/webp;base64,UklGRtIUAABXRUJQVlA4IMSFAABQJgCdASoYChgCPpFGnkulpCMho/M7s/A/iWlu/V7UA/579bvdX+W/2f23+R/wv+P9z/u5+539+/3b1W/vv+j/s/t2+wH+T/xn+B/4X/A/2T9x/8B/r/yL/tf5b/u/yT8kP5N/of7V/w/8R+zH8w/z3/n/4X/Bf2L9oP+P8A/7c/QD/ff6b/y/9l+an/8e6n7u/2X63f4b/Af8p/Zf+F/ev3F/tv+B/y/+d/0X/P/0H/E/3n/i/4L/Pf+R/kv+x/un///93/////7gf7L////7s/AD/v+qf8H/9v5L/////wJ/N//f+zH+//6H+//+r/I/93/8v/////y1+99Pj0l5W4VpC1Y3BSSb44i6lGjXmY2m4zL5wQkUuL3lTjR+79Qk72eEwKx7yScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJyScknJJySckn"
-                alt="Miki Barber Shop Logo"
-                width={40}
-                height={40}
-                className="rounded-full object-cover"
-              />
+            <svg width="40" height="40" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg" className="rounded-full">
+                <circle cx="70" cy="70" r="70" fill="hsl(var(--card))"/>
+                <path d="M53.6281 48.7523C52.011 47.1352 50.1132 46 47.9347 46C43.5777 46 40 49.5777 40 53.9347C40 55.7925 40.671 57.5101 41.8123 58.8306L61.5878 78.6061C62.9083 77.4649 64.6259 76.7938 66.4836 76.7938C70.8407 76.7938 74.4184 80.3715 74.4184 84.7285C74.4184 86.8997 73.6199 88.892 72.261 90.3804L90.3804 72.261C88.892 73.6199 86.8997 74.4184 84.7285 74.4184C80.3715 74.4184 76.7938 70.8407 76.7938 66.4836C76.7938 64.6259 77.4649 62.9083 78.6061 61.5878L53.6281 48.7523Z" stroke="hsl(var(--primary))" strokeWidth="4"/>
+                <path d="M96.3719 91.2477C97.989 92.8648 99.8868 94 102.065 94C106.422 94 110 90.4223 110 86.0653C110 84.2075 109.329 82.4899 108.188 81.1694L88.4122 61.3939C87.0917 62.5351 85.3741 63.2062 83.5164 63.2062C79.1593 63.2062 75.5816 59.6285 75.5816 55.2715C75.5816 53.1003 76.3801 51.108 77.739 49.6196L59.6196 67.739C61.108 66.3801 63.1003 65.5816 65.2715 65.5816C69.6285 65.5816 73.2062 69.1593 73.2062 73.5164C73.2062 75.3741 72.5351 77.0917 71.3939 78.4122L96.3719 91.2477Z" stroke="hsl(var(--primary))" strokeWidth="4"/>
+            </svg>
             <span className="text-xl font-headline font-semibold group-data-[collapsible=icon]:hidden">Miki Barber</span>
           </div>
         </SidebarHeader>

@@ -34,12 +34,12 @@ export default function AdminLayout({
           <div className="flex items-center gap-2 p-2">
             <Image
                 src="/logo.png"
-                alt="Miki Barber Logo"
+                alt="Miki Barber Shop Logo"
                 width={40}
                 height={40}
                 className="rounded-full"
             />
-            <span className="text-xl font-headline font-semibold group-data-[collapsible=icon]:hidden">Miki Barber</span>
+            <span className="text-xl font-headline font-semibold group-data-[collapsible=icon]:hidden">Miki Barber Shop</span>
           </div>
         </SidebarHeader>
         <SidebarContent>

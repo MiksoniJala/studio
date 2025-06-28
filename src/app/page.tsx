@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -35,17 +34,17 @@ export default function Home() {
               <div className="mb-4">
                  <Image
                     src="/logo.png"
-                    alt="Miki Barber Logo"
+                    alt="Miki Barber Shop Logo"
                     width={120}
                     height={120}
                     className="mx-auto rounded-full"
                 />
               </div>
               <h1 className="font-headline text-4xl md:text-6xl font-bold tracking-tight">
-                Dobrodošli u Miki Barber
+                Dobrodošli u Miki Barber Shop
               </h1>
               <p className="mt-2 text-lg text-muted-foreground max-w-2xl mx-auto">
-                Započnite odabirom svog omiljenog barbera.
+                Odaberite svog barbera i rezervišite termin online.
               </p>
             </header>
             <BarberProfiles onSelectBarber={handleSelectBarber} />
@@ -71,7 +70,7 @@ export default function Home() {
       </main>
       <footer className="bg-card border-t mt-12">
           <div className="container mx-auto py-6 px-4 text-center text-muted-foreground space-y-4">
-              <p>&copy; {new Date().getFullYear()} Miki Barber. Sva prava zadržana.</p>
+              <p>&copy; {new Date().getFullYear()} Miki Barber Shop. Sva prava zadržana.</p>
               <Button asChild variant="link">
                 <Link href="/admin/login">Admin Panel</Link>
               </Button>

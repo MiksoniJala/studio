@@ -4,8 +4,8 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'Miki Barber',
-  description: 'Rezervišite svoj termin u Miki Barber',
+  title: 'Miki Barber Shop',
+  description: 'Rezervišite svoj termin u Miki Barber Shop',
 };
 
 export default function RootLayout({

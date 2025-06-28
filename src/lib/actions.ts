@@ -50,13 +50,13 @@ if (!globalForDb.barbers) {
   globalForDb.barbers = [
     {
       name: "Miki",
-      description: "Specijalista za klasične fade frizure i precizno oblikovanje brade. Miki donosi svježinu i kreativnost u svaki rez.",
+      description: "Specijalista za klasične fade frizure i precizno oblikovanje brade.",
       image: "https://placehold.co/400x400.png",
       hint: "classic barber portrait"
     },
     {
       name: "Huske",
-      description: "Mladi frizer na praksi sa strašću za praćenje modernih tehnika i trendova. Huske je odličan izbor za svakoga ko želi isprobati nešto novo.",
+      description: "Mladi frizer sa strašću za modernim tehnikama i trendovima.",
       image: "https://placehold.co/400x400.png",
       hint: "modern barber portrait"
     }
@@ -74,7 +74,6 @@ if (!globalForDb.works) {
 }
 if (!globalForDb.nonWorkingDays) {
     globalForDb.nonWorkingDays = [
-        new Date(2024, 5, 28), // 28. juni, 2024
         new Date(2025, 0, 1), // New Year
         new Date(2025, 4, 1), // Labor Day
     ]

@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { BookingForm } from "@/components/booking-form";
 import { BarberProfiles } from "@/components/barber-profiles";
@@ -21,6 +21,16 @@ interface HomePageClientProps {
 export function HomePageClient({ barbers, works, nonWorkingDays }: HomePageClientProps) {
   const [selectedBarber, setSelectedBarber] = useState<string | null>(null);
   const bookingRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // On component mount, ensure the window is scrolled to the top.
+    // This prevents the browser from restoring a previous scroll position on refresh,
+    // which can lead to jumping, especially with animated/dynamic content.
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+    window.scrollTo(0, 0);
+  }, []);
 
   const handleSelectBarber = (name: string) => {
     setSelectedBarber(name);

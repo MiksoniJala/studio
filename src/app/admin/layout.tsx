@@ -20,7 +20,7 @@ import {
   SidebarInset,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { logoutAction } from "@/lib/actions";
+import { logoutAction } from "@/lib/auth";
 
 export default function AdminLayout({
   children,

@@ -1,11 +1,24 @@
 
 'use server';
 
-import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
-import { cookies } from 'next/headers';
 import { isSameDay, parseISO } from 'date-fns';
+import { db, storage } from '@/lib/firebase';
+import { 
+  collection, 
+  getDocs, 
+  addDoc, 
+  deleteDoc, 
+  doc, 
+  query, 
+  where,
+  orderBy,
+  serverTimestamp,
+  Timestamp
+} from 'firebase/firestore';
+import { ref, uploadString, getDownloadURL, deleteObject } from 'firebase/storage';
+
 
 // --- DATA TYPES ---
 
@@ -20,6 +33,7 @@ const bookingSchema = z.object({
 export type BookingFormData = z.infer<typeof bookingSchema>;
 
 export interface Barber {
+    id: string;
     name: string;
     description: string;
     image: string;
@@ -27,83 +41,12 @@ export interface Barber {
 }
 
 export interface Work {
+    id: string;
     src: string;
     alt: string;
     hint: string;
-}
-
-// --- IN-MEMORY DATABASE ---
-
-const globalForDb = globalThis as unknown as {
-  bookings: (BookingFormData & { id: number })[];
-  lastBookingId: number;
-  barbers: Barber[];
-  works: Work[];
-  nonWorkingDays: Date[];
-};
-
-// Initialize the in-memory "database" 
-if (!globalForDb.bookings) globalForDb.bookings = [];
-if (globalForDb.lastBookingId === undefined) globalForDb.lastBookingId = 0;
-
-if (!globalForDb.barbers) {
-  globalForDb.barbers = [
-    {
-      name: "Miki",
-      description: "Specijalista za klasične fade frizure i precizno oblikovanje brade.",
-      image: "https://placehold.co/400x400.png",
-      hint: "classic barber portrait"
-    },
-    {
-      name: "Huske",
-      description: "Mladi frizer sa strašću za modernim tehnikama i trendovima.",
-      image: "https://placehold.co/400x400.png",
-      hint: "modern barber portrait"
-    }
-  ];
-}
-if (!globalForDb.works) {
-  globalForDb.works = [
-    { src: "https://placehold.co/600x400.png", alt: "Moderna frizura sa čistim fadeom", hint: "stylish haircut" },
-    { src: "https://placehold.co/600x400.png", alt: "Precizno šišanje i oblikovanje brade", hint: "beard trim" },
-    { src: "https://placehold.co/600x400.png", alt: "Klasična muška frizura", hint: "classic haircut" },
-    { src: "https://placehold.co/600x400.png", alt: "Moderna teksturirana frizura", hint: "modern hairstyle" },
-    { src: "https://placehold.co/600x400.png", alt: "Oštra linija na svježoj frizuri", hint: "sharp lineup" },
-    { src: "https://placehold.co/600x400.png", alt: "Usluga brijanja vrućim peškirom", hint: "hot towel" },
-  ];
-}
-if (!globalForDb.nonWorkingDays) {
-    globalForDb.nonWorkingDays = [
-        new Date(2025, 0, 1), // New Year
-        new Date(2025, 4, 1), // Labor Day
-    ]
-}
-
-
-// --- AUTH ACTIONS ---
-
-export type LoginState = {
-  message: string | null;
-};
-
-export async function loginAction(
-  prevState: LoginState,
-  formData: FormData
-): Promise<LoginState> {
-  const email = formData.get('email');
-  const password = formData.get('password');
-
-  if (email === 'admin@primjer.com' && password === 'ryze2025') {
-    cookies().set('session', 'true', { httpOnly: true, path: '/' });
-    redirect('/admin');
-  }
-
-  return { message: 'Nevažeći email ili lozinka.' };
-}
-
-export async function logoutAction() {
-    cookies().delete('session');
-    redirect('/admin/login');
+    storagePath: string;
+    createdAt?: Timestamp;
 }
 
 
@@ -113,9 +56,18 @@ export async function getDailyBookedSlots(
   date: string,
   barber: string
 ): Promise<string[]> {
-  return globalForDb.bookings
-    .filter(b => b.date === date && b.barber === barber)
-    .map(b => b.time);
+  try {
+    const q = query(
+      collection(db, 'bookings'), 
+      where('date', '==', date), 
+      where('barber', '==', barber)
+    );
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => doc.data().time);
+  } catch (error) {
+    console.error("Error fetching daily booked slots: ", error);
+    return [];
+  }
 }
 
 export async function createBooking(data: BookingFormData) {
@@ -126,50 +78,75 @@ export async function createBooking(data: BookingFormData) {
   
   const bookingDate = parseISO(result.data.date);
 
+  // Server-side validation
   if (bookingDate.getDay() === 0) {
       return { success: false, error: 'Nedjelja je neradni dan. Molimo izaberite drugi dan.' };
   }
   
-  const isNonWorking = globalForDb.nonWorkingDays.some(d => isSameDay(d, bookingDate));
+  const nonWorkingDays = await getNonWorkingDays();
+  const isNonWorking = nonWorkingDays.some(d => isSameDay(d, bookingDate));
   if (isNonWorking) {
     return { success: false, error: 'Odabrani datum je neradni dan.' };
   }
 
-  const isSlotTaken = globalForDb.bookings.some(
-    booking =>
-      booking.date === result.data.date &&
-      booking.time === result.data.time &&
-      booking.barber === result.data.barber
-  );
-  
-  if (isSlotTaken) {
+  const bookedSlots = await getDailyBookedSlots(result.data.date, result.data.barber);
+  if (bookedSlots.includes(result.data.time)) {
     return { success: false, error: 'Žao nam je, ovaj termin je upravo zauzet. Molimo izaberite drugi.' };
   }
+  
+  try {
+    await addDoc(collection(db, 'bookings'), {
+      ...result.data,
+      createdAt: serverTimestamp(),
+    });
 
-  globalForDb.lastBookingId++;
-  const newBooking = { ...result.data, id: globalForDb.lastBookingId };
-  globalForDb.bookings.push(newBooking);
-  
-  revalidatePath('/admin');
-  revalidatePath('/');
-  
-  return { success: true };
+    revalidatePath('/admin');
+    revalidatePath('/');
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Error creating booking: ", error);
+    return { success: false, error: 'Došlo je do greške prilikom kreiranja rezervacije.' };
+  }
 }
 
 export async function getBookings() {
-  return [...globalForDb.bookings].sort((a, b) => b.id - a.id);
+   try {
+    const q = query(collection(db, 'bookings'), orderBy('createdAt', 'desc'));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as (BookingFormData & {id: string})[];
+  } catch (error) {
+    console.error("Error fetching bookings: ", error);
+    return [];
+  }
 }
 
 // --- BARBER ACTIONS ---
 
 export async function getBarbers(): Promise<Barber[]> {
-    return globalForDb.barbers;
+   try {
+    const querySnapshot = await getDocs(collection(db, 'barbers'));
+    return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as Barber[];
+  } catch (error) {
+    console.error("Error fetching barbers: ", error);
+    return [];
+  }
 }
 
 // --- GALLERY ACTIONS ---
 
 export async function getWorks(): Promise<Work[]> {
-    return globalForDb.works;
+    try {
+        const q = query(collection(db, 'works'), orderBy('createdAt', 'desc'));
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => ({
+            ...doc.data(),
+            id: doc.id,
+        })) as Work[];
+    } catch (error) {
+        console.error("Error fetching works: ", error);
+        return [];
+    }
 }
 
 const addImageSchema = z.object({
@@ -179,33 +156,69 @@ const addImageSchema = z.object({
 });
 
 export async function addImage(formData: FormData) {
-    const newWork = {
+    const imageData = {
         src: formData.get('src') as string,
         alt: formData.get('alt') as string,
         hint: formData.get('hint') as string,
     }
-    const result = addImageSchema.safeParse(newWork);
+    const result = addImageSchema.safeParse(imageData);
     if (!result.success) {
         return { error: result.error.errors.map(e => e.message).join(', ') };
     }
 
-    globalForDb.works.unshift(result.data);
-    revalidatePath('/admin/gallery');
-    revalidatePath('/');
-    return { success: true };
+    try {
+      const storagePath = `gallery/${Date.now()}_${result.data.alt.replace(/\s+/g, '-')}`;
+      const storageRef = ref(storage, storagePath);
+      
+      const uploadResult = await uploadString(storageRef, result.data.src, 'data_url');
+      const downloadURL = await getDownloadURL(uploadResult.ref);
+
+      await addDoc(collection(db, 'works'), {
+        src: downloadURL,
+        alt: result.data.alt,
+        hint: result.data.hint,
+        storagePath: storagePath,
+        createdAt: serverTimestamp(),
+      });
+      
+      revalidatePath('/admin/gallery');
+      revalidatePath('/');
+      return { success: true };
+    } catch(error) {
+       console.error("Error adding image: ", error);
+       return { error: "Nije uspjelo dodavanje slike." };
+    }
 }
 
 const removeImageSchema = z.object({
-    index: z.coerce.number(),
+    id: z.string(),
+    storagePath: z.string(),
 });
 
 export async function removeImage(formData: FormData) {
-    const result = removeImageSchema.safeParse({ index: formData.get('index') });
+    const result = removeImageSchema.safeParse({ 
+      id: formData.get('id'),
+      storagePath: formData.get('storagePath')
+    });
 
-    if (result.success) {
-        globalForDb.works.splice(result.data.index, 1);
-        revalidatePath('/admin/gallery');
-        revalidatePath('/');
+    if (!result.success) {
+      return { error: "Nevažeći podaci za brisanje." };
+    }
+    
+    try {
+      // Delete from storage
+      const storageRef = ref(storage, result.data.storagePath);
+      await deleteObject(storageRef);
+      
+      // Delete from firestore
+      await deleteDoc(doc(db, 'works', result.data.id));
+
+      revalidatePath('/admin/gallery');
+      revalidatePath('/');
+      return { success: true };
+    } catch (error) {
+      console.error("Error removing image: ", error);
+      return { error: "Nije uspjelo brisanje slike." };
     }
 }
 
@@ -213,7 +226,16 @@ export async function removeImage(formData: FormData) {
 // --- SETTINGS ACTIONS ---
 
 export async function getNonWorkingDays(): Promise<Date[]> {
-    return globalForDb.nonWorkingDays;
+    try {
+        const querySnapshot = await getDocs(collection(db, 'nonWorkingDays'));
+        return querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return (data.date as Timestamp).toDate();
+        });
+    } catch (error) {
+        console.error("Error fetching non-working days: ", error);
+        return [];
+    }
 }
 
 export async function addNonWorkingDay(formData: FormData) {
@@ -221,10 +243,10 @@ export async function addNonWorkingDay(formData: FormData) {
     if (!dateStr) return;
     
     const date = parseISO(dateStr);
-    
-    if (!globalForDb.nonWorkingDays.some(d => isSameDay(d, date))) {
-        globalForDb.nonWorkingDays.push(date);
-        globalForDb.nonWorkingDays.sort((a, b) => a.getTime() - b.getTime());
+    const nonWorkingDays = await getNonWorkingDays();
+
+    if (!nonWorkingDays.some(d => isSameDay(d, date))) {
+        await addDoc(collection(db, 'nonWorkingDays'), { date });
         revalidatePath('/admin/settings');
         revalidatePath('/');
     }
@@ -232,12 +254,27 @@ export async function addNonWorkingDay(formData: FormData) {
 
 export async function removeNonWorkingDay(formData: FormData) {
     const dateStr = formData.get('date') as string;
-     if (!dateStr) return;
+    if (!dateStr) return;
 
-    const dateToRemove = parseISO(dateStr);
-    globalForDb.nonWorkingDays = globalForDb.nonWorkingDays.filter(
-        d => !isSameDay(d, dateToRemove)
-    );
-    revalidatePath('/admin/settings');
-    revalidatePath('/');
+    try {
+        const dateToRemove = parseISO(dateStr);
+        const q = query(collection(db, 'nonWorkingDays'));
+        const querySnapshot = await getDocs(q);
+
+        let docIdToDelete: string | null = null;
+        querySnapshot.forEach((document) => {
+            const day = (document.data().date as Timestamp).toDate();
+            if (isSameDay(day, dateToRemove)) {
+                docIdToDelete = document.id;
+            }
+        });
+        
+        if (docIdToDelete) {
+            await deleteDoc(doc(db, 'nonWorkingDays', docIdToDelete));
+            revalidatePath('/admin/settings');
+            revalidatePath('/');
+        }
+    } catch (error) {
+        console.error("Error removing non-working day:", error);
+    }
 }

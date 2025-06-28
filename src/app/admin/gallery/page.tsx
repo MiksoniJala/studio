@@ -17,20 +17,22 @@ export default function GalleryAdminPage() {
     const [works, setWorks] = useState<Work[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isAdding, startAddTransition] = useTransition();
-    const [isDeleting, startDeleteTransition] = useTransition();
+    const [deletingId, setDeletingId] = useState<string | null>(null);
     const { toast } = useToast();
     const formRef = useRef<HTMLFormElement>(null);
 
     const refreshWorks = async () => {
+        setIsLoading(true);
         const data = await getWorks();
         setWorks(data);
+        setIsLoading(false);
     };
 
     useEffect(() => {
-        refreshWorks().then(() => setIsLoading(false));
+        refreshWorks();
     }, []);
     
-    const isPending = isAdding || isDeleting;
+    const isPending = isAdding || !!deletingId;
 
     const handleSubmit = (formData: FormData) => {
         const file = formData.get('imageFile') as File;
@@ -39,6 +41,12 @@ export default function GalleryAdminPage() {
 
         if (!file || file.size === 0) {
             toast({ variant: 'destructive', title: 'Greška', description: 'Molimo odaberite sliku.' });
+            return;
+        }
+        
+        // Limit file size to 4MB
+        if (file.size > 4 * 1024 * 1024) {
+            toast({ variant: 'destructive', title: 'Greška', description: 'Slika je prevelika. Maksimalna veličina je 4MB.' });
             return;
         }
 
@@ -68,14 +76,22 @@ export default function GalleryAdminPage() {
         });
     }
 
-    const handleRemoveImage = (index: number) => {
-         startDeleteTransition(async () => {
-            const formData = new FormData();
-            formData.append('index', index.toString());
-            await removeImage(formData);
-            toast({ title: 'Uspjeh!', description: 'Slika je obrisana.'});
-            await refreshWorks();
-        });
+    const handleRemoveImage = (work: Work) => {
+         setDeletingId(work.id);
+         const formData = new FormData();
+         formData.append('id', work.id);
+         formData.append('storagePath', work.storagePath);
+         
+         removeImage(formData).then(async (result) => {
+            if (result?.error) {
+                toast({ variant: 'destructive', title: 'Greška', description: result.error });
+            } else {
+                toast({ title: 'Uspjeh!', description: 'Slika je obrisana.'});
+                await refreshWorks();
+            }
+         }).finally(() => {
+            setDeletingId(null);
+         });
     }
 
     return (
@@ -88,8 +104,8 @@ export default function GalleryAdminPage() {
                 <CardContent>
                     <form ref={formRef} action={handleSubmit} className="space-y-4 max-w-sm">
                         <div className="space-y-1.5">
-                            <Label htmlFor="imageFile">Fajl Slike</Label>
-                            <Input id="imageFile" name="imageFile" type="file" accept="image/*" required disabled={isPending} />
+                            <Label htmlFor="imageFile">Fajl Slike (Max 4MB)</Label>
+                            <Input id="imageFile" name="imageFile" type="file" accept="image/png, image/jpeg, image/webp" required disabled={isPending} />
                         </div>
                         <div className="space-y-1.5">
                             <Label htmlFor="alt">Alternativni Tekst (Opis)</Label>
@@ -118,8 +134,8 @@ export default function GalleryAdminPage() {
                         </div>
                     ) : (
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                            {works.map((work, index) => (
-                              <div key={work.src.slice(0, 20) + index} className="relative group">
+                            {works.map((work) => (
+                              <div key={work.id} className="relative group">
                                 <Image
                                     src={work.src}
                                     alt={work.alt}
@@ -130,9 +146,9 @@ export default function GalleryAdminPage() {
                                     sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
                                 />
                                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <form action={() => handleRemoveImage(index)}>
+                                    <form action={() => handleRemoveImage(work)}>
                                         <Button variant="destructive" size="sm" type="submit" disabled={isPending}>
-                                            {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Obriši"}
+                                            {deletingId === work.id ? <Loader2 className="h-4 w-4 animate-spin" /> : "Obriši"}
                                         </Button>
                                     </form>
                                 </div>

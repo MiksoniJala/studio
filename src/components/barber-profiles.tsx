@@ -1,5 +1,8 @@
 
+'use client';
+
 import Image from "next/image";
+import { motion } from "framer-motion";
 
 const barbers = [
   {
@@ -17,32 +20,57 @@ const barbers = [
 ];
 
 interface BarberProfilesProps {
-    onSelectBarber?: (name: string) => void;
+    onSelectBarber: (name: string) => void;
 }
 
-export function BarberProfiles({ onSelectBarber }: BarberProfilesProps) {
-  const isSelectable = !!onSelectBarber;
+const containerVariants = {
+  hidden: { opacity: 1 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2,
+      delayChildren: 0.1,
+    },
+  },
+};
 
+const profileVariants = {
+  hidden: { y: 50, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      duration: 0.6,
+      ease: "easeOut"
+    }
+  },
+};
+
+export function BarberProfiles({ onSelectBarber }: BarberProfilesProps) {
   return (
     <section>
-      {!isSelectable && (
-        <div className="text-center mb-12">
-            <h2 className="font-headline text-3xl md:text-4xl font-bold">Upoznajte Naše Barbere</h2>
-            <p className="mt-2 text-lg text-muted-foreground">Majstori iza makaza.</p>
-        </div>
-      )}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+      <div className="text-center mb-12">
+          <h2 className="font-headline text-3xl md:text-4xl font-bold">Upoznajte Naše Barbere</h2>
+          <p className="mt-2 text-lg text-muted-foreground">Odaberite svog majstora.</p>
+      </div>
+      <motion.div 
+        className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
         {barbers.map((barber) => (
-          <div 
+          <motion.div 
             key={barber.name} 
-            className={`flex flex-col items-center text-center gap-4 p-6 rounded-lg border-2 ${isSelectable ? 'border-transparent hover:border-primary hover:shadow-2xl hover:scale-105 cursor-pointer transform transition-all duration-300' : 'border-none'}`}
-            onClick={() => onSelectBarber?.(barber.name)}
-            role={isSelectable ? 'button' : undefined}
-            tabIndex={isSelectable ? 0 : -1}
+            variants={profileVariants}
+            className="flex flex-col items-center text-center gap-4 p-6 rounded-lg border-2 border-transparent hover:border-primary hover:shadow-2xl hover:scale-105 cursor-pointer transform transition-all duration-300"
+            onClick={() => onSelectBarber(barber.name)}
+            role="button"
+            tabIndex={0}
             onKeyDown={(e) => {
-                if(isSelectable && (e.key === 'Enter' || e.key === ' ')) {
+                if(e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
-                    onSelectBarber?.(barber.name);
+                    onSelectBarber(barber.name);
                 }
             }}
           >
@@ -56,9 +84,9 @@ export function BarberProfiles({ onSelectBarber }: BarberProfilesProps) {
             />
             <h3 className="font-headline text-2xl font-semibold mt-2">{barber.name}</h3>
             <p className="mt-1 text-muted-foreground max-w-md">{barber.description}</p>
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
     </section>
   );
 }

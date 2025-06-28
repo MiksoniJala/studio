@@ -15,13 +15,13 @@ const barbers = [
   {
     name: "Mirsad",
     description: "Sa preko 15 godina iskustva, Mirsad je majstor klasičnih frizura i modernih stilova.",
-    image: "/logo.png",
+    image: "https://placehold.co/400x400.png",
     hint: "classic barber portrait"
   },
   {
     name: "Huske",
     description: "Huske donosi svjež, umjetnički pristup berberskom zanatu. Specijalizirao se za kreativne fadeove.",
-    image: "/logo.png",
+    image: "https://placehold.co/400x400.png",
     hint: "modern barber portrait"
   }
 ];

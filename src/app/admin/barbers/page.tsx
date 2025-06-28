@@ -13,8 +13,8 @@ import Image from "next/image";
 
 const barbers = [
   {
-    name: "Mirsad",
-    description: "Sa preko 15 godina iskustva, Mirsad je majstor klasičnih frizura i modernih stilova.",
+    name: "Miki",
+    description: "Specijalizovan za klasične fade frizure, precizno oblikovanje brade i frizure inspirisane tattoo art stilom. Sa svojih 18 godina, Miki donosi svježinu i kreativnost u svaki rez, kombinujući moderno s klasičnim tehnikama. Njegova preciznost, osjećaj za detalje i posvećenost klijentima čine ga savršenim izborom za one koji žele upečatljiv i besprijekoran izgled.",
     image: "https://placehold.co/400x400.png",
     hint: "classic barber portrait"
   },

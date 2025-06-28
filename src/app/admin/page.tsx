@@ -16,7 +16,7 @@ const mockReservations = [
     phone: "555-123-4567",
     date: "2024-08-15",
     time: "10:00",
-    barber: "Mirsad",
+    barber: "Miki",
   },
   {
     id: "2",
@@ -32,7 +32,7 @@ const mockReservations = [
     phone: "555-456-7890",
     date: "2024-08-15",
     time: "14:00",
-    barber: "Mirsad",
+    barber: "Miki",
   },
   {
     id: "4",
@@ -84,7 +84,7 @@ export default function AdminPage({
                     <TableCell>{res.phone}</TableCell>
                     <TableCell>{res.date}</TableCell>
                     <TableCell>{res.time}</TableCell>
-                    <TableCell><Badge variant={res.barber === 'Mirsad' ? 'default' : 'secondary'}>{res.barber}</Badge></TableCell>
+                    <TableCell><Badge variant={res.barber === 'Miki' ? 'default' : 'secondary'}>{res.barber}</Badge></TableCell>
                 </TableRow>
                 ))}
             </TableBody>

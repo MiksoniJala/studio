@@ -27,7 +27,7 @@ import { useToast } from "@/hooks/use-toast";
 const bookingSchema = z.object({
   date: z.date({ required_error: "Molimo odaberite datum." }),
   time: z.string({ required_error: "Molimo odaberite vrijeme." }),
-  barber: z.enum(["Mirsad", "Huske"], { required_error: "Molimo odaberite barbera." }),
+  barber: z.enum(["Miki", "Huske"], { required_error: "Molimo odaberite barbera." }),
   name: z.string().min(2, "Ime mora sadržavati najmanje 2 karaktera."),
   phone: z.string().min(5, "Molimo unesite važeći broj telefona."),
 });
@@ -44,7 +44,7 @@ export function BookingForm({ barber }: { barber: string | null }) {
   const [suggestions, setSuggestions] = useState<SuggestAlternativeTimesOutput | null>(null);
   const { toast } = useToast();
   
-  const barberDisplayName = barber === 'Mirsad' ? 'Mirsada' : (barber === 'Huske' ? 'Husketa' : '');
+  const barberDisplayName = barber === 'Miki' ? 'Mikija' : (barber === 'Huske' ? 'Husketa' : '');
 
   const form = useForm<z.infer<typeof bookingSchema>>({
     resolver: zodResolver(bookingSchema),
@@ -58,7 +58,7 @@ export function BookingForm({ barber }: { barber: string | null }) {
 
   useEffect(() => {
     if (barber) {
-        form.setValue('barber', barber as "Mirsad" | "Huske");
+        form.setValue('barber', barber as "Miki" | "Huske");
     }
   }, [barber, form]);
 

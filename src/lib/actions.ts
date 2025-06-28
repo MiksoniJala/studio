@@ -12,11 +12,11 @@ export async function getSuggestions(
   barberName: string,
 ): Promise<SuggestAlternativeTimesOutput | null> {
   // This is a simplified check. In a real app, this would query a database.
-  // We simulate that Mirsad is busy on the half-hour, and Huske is busy on the hour.
-  const isMirsadBusy = barberName === 'Mirsad' && preferredTime.endsWith(':30');
+  // We simulate that Miki is busy on the half-hour, and Huske is busy on the hour.
+  const isMikiBusy = barberName === 'Miki' && preferredTime.endsWith(':30');
   const isHuskeBusy = barberName === 'Huske' && preferredTime.endsWith(':00');
 
-  if (!isMirsadBusy && !isHuskeBusy) {
+  if (!isMikiBusy && !isHuskeBusy) {
     return null;
   }
 
@@ -27,7 +27,7 @@ export async function getSuggestions(
   });
 
   let availableSlots: string[];
-  if (barberName === 'Mirsad') {
+  if (barberName === 'Miki') {
     availableSlots = allTimeSlots.filter(time => time.endsWith(':00'));
   } else if (barberName === 'Huske') {
     availableSlots = allTimeSlots.filter(time => time.endsWith(':30'));

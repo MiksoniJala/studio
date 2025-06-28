@@ -12,8 +12,11 @@ export async function getSuggestions(
   barberName: string,
 ): Promise<SuggestAlternativeTimesOutput | null> {
   // This is a simplified check. In a real app, this would query a database.
-  // We simulate that times ending in ":30" are booked.
-  if (!preferredTime.endsWith(':30')) {
+  // We simulate that Mirsad is busy on the half-hour, and Huske is busy on the hour.
+  const isMirsadBusy = barberName === 'Mirsad' && preferredTime.endsWith(':30');
+  const isHuskeBusy = barberName === 'Huske' && preferredTime.endsWith(':00');
+
+  if (!isMirsadBusy && !isHuskeBusy) {
     return null;
   }
   

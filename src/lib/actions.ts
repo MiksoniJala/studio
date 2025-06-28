@@ -2,8 +2,6 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import { suggestAlternativeTimes } from '@/ai/flows/suggest-alternative-times';
-import type { SuggestAlternativeTimesOutput } from '@/ai/flows/suggest-alternative-times';
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 
@@ -35,56 +33,13 @@ if (globalForDb.lastBookingId === undefined) {
 const bookings = globalForDb.bookings;
 
 
-export async function getSuggestions(
-  preferredDate: string,
-  preferredTime: string,
-  barberName: string,
-): Promise<SuggestAlternativeTimesOutput | null> {
-  // Check if a booking already exists for this date, time, and barber.
-  const isSlotTaken = bookings.some(
-    booking =>
-      booking.date === preferredDate &&
-      booking.time === preferredTime &&
-      booking.barber === barberName
-  );
-
-  // If the slot is not taken, it's available. Return null.
-  if (!isSlotTaken) {
-    return null;
-  }
-
-  // If the slot is taken, proceed to suggest alternatives.
-  const allTimeSlots = Array.from({ length: 16 }, (_, i) => {
-    const hour = Math.floor(i / 2) + 8;
-    const minute = i % 2 === 0 ? "00" : "30";
-    return `${String(hour).padStart(2, '0')}:${minute}`;
-  });
-
-  // Find all slots that are already booked for that barber on that day.
-  const bookedSlotsForDay = bookings
-    .filter(b => b.date === preferredDate && b.barber === barberName)
+export async function getDailyBookedSlots(
+  date: string,
+  barber: string
+): Promise<string[]> {
+  return bookings
+    .filter(b => b.date === date && b.barber === barber)
     .map(b => b.time);
-
-  // Available slots are all slots minus the booked ones.
-  const availableSlots = allTimeSlots.filter(
-    slot => !bookedSlotsForDay.includes(slot)
-  );
-  
-  try {
-    const suggestions = await suggestAlternativeTimes({
-      preferredDate,
-      preferredTime,
-      barberName: barberName || 'any',
-      availableSlots,
-    });
-    return suggestions;
-  } catch (error) {
-    console.error('Error getting AI suggestions:', error);
-    return {
-      alternativeTimes: [],
-      reason: 'Imali smo problema s provjerom alternativnih termina. Molimo pokušajte drugo vrijeme ili dan.',
-    };
-  }
 }
 
 export async function createBooking(data: BookingFormData) {

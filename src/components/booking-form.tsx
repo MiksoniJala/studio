@@ -8,21 +8,20 @@ import { z } from "zod";
 import { format } from "date-fns";
 import { bs } from "date-fns/locale";
 import Image from "next/image";
-import { Calendar as CalendarIcon, Clock, User, Phone, Scissors, Loader2, PartyPopper, AlertTriangle, ArrowRight, ArrowLeft } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, User, Phone, Scissors, Loader2, PartyPopper, ArrowRight, ArrowLeft } from "lucide-react";
+import type { VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { getSuggestions, createBooking } from "@/lib/actions";
+import { getDailyBookedSlots, createBooking } from "@/lib/actions";
 import type { BookingFormData } from "@/lib/actions";
-import type { SuggestAlternativeTimesOutput } from "@/ai/flows/suggest-alternative-times";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const bookingSchema = z.object({
   date: z.date({ required_error: "Molimo odaberite datum." }),
@@ -41,7 +40,8 @@ const timeSlots = Array.from({ length: 16 }, (_, i) => {
 export function BookingForm({ barber }: { barber: string | null }) {
   const [step, setStep] = useState(1);
   const [isPending, startTransition] = useTransition();
-  const [suggestions, setSuggestions] = useState<SuggestAlternativeTimesOutput | null>(null);
+  const [bookedSlots, setBookedSlots] = useState<string[]>([]);
+  const [isLoadingSlots, setIsLoadingSlots] = useState(true);
   const { toast } = useToast();
   
   const barberDisplayName = barber === 'Miki' ? 'Mikija' : (barber === 'Huske' ? 'Husketa' : '');
@@ -56,6 +56,22 @@ export function BookingForm({ barber }: { barber: string | null }) {
     },
   });
 
+  const selectedDate = form.watch('date');
+
+  useEffect(() => {
+    if (barber && selectedDate) {
+      const fetchBookedSlots = async () => {
+        setIsLoadingSlots(true);
+        const dateStr = format(selectedDate, "yyyy-MM-dd");
+        const slots = await getDailyBookedSlots(dateStr, barber);
+        setBookedSlots(slots);
+        setIsLoadingSlots(false);
+      };
+      fetchBookedSlots();
+    }
+  }, [selectedDate, barber]);
+
+
   useEffect(() => {
     if (barber) {
         form.setValue('barber', barber as "Miki" | "Huske");
@@ -64,17 +80,7 @@ export function BookingForm({ barber }: { barber: string | null }) {
 
   const handleTimeSelect = (time: string) => {
     form.setValue("time", time);
-    setSuggestions(null);
-    startTransition(async () => {
-      const date = form.getValues("date");
-      const barberName = form.getValues("barber");
-      const result = await getSuggestions(format(date, "yyyy-MM-dd"), time, barberName);
-      if (result) {
-        setSuggestions(result);
-      } else {
-        setStep(2);
-      }
-    });
+    setStep(2);
   };
 
   const processForm = async (data: z.infer<typeof bookingSchema>) => {
@@ -137,7 +143,10 @@ export function BookingForm({ barber }: { barber: string | null }) {
                           <Calendar
                             mode="single"
                             selected={field.value}
-                            onSelect={field.onChange}
+                            onSelect={(date) => {
+                                field.onChange(date);
+                                form.setValue("time", ""); // Reset time on date change
+                            }}
                             disabled={(date) => date < new Date(new Date().setDate(new Date().getDate() - 1))}
                             initialFocus
                             locale={bs}
@@ -150,43 +159,38 @@ export function BookingForm({ barber }: { barber: string | null }) {
                 />
                 
                 <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
-                  {timeSlots.map((time) => {
-                    const isSelected = form.watch("time") === time;
-                    return (
-                      <Button
-                        key={time}
-                        type="button"
-                        variant={isSelected ? "default" : "outline"}
-                        onClick={() => handleTimeSelect(time)}
-                        disabled={isPending}
-                        className="relative"
-                      >
-                        {isPending && isSelected && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        {time}
-                      </Button>
-                    );
-                  })}
-                </div>
+                  {isLoadingSlots
+                    ? Array.from({ length: 16 }).map((_, i) => (
+                        <Skeleton key={i} className="h-10" />
+                      ))
+                    : timeSlots.map((time) => {
+                        const isBooked = bookedSlots.includes(time);
+                        const isSelected = form.watch("time") === time;
+                        
+                        let variant: VariantProps<typeof buttonVariants>["variant"];
 
-                {isPending && <p className="text-center text-muted-foreground">Provjera dostupnosti...</p>}
-                
-                {suggestions && (
-                  <Alert variant="destructive">
-                    <AlertTriangle className="h-4 w-4" />
-                    <AlertTitle>Termin Nije Dostupan</AlertTitle>
-                    <AlertDescription>
-                      <p className="mb-2">{suggestions.reason}</p>
-                      {suggestions.alternativeTimes.length > 0 && <p className="font-semibold mb-2">Predlažemo ove alternativne termine:</p>}
-                      <div className="flex gap-2">
-                        {suggestions.alternativeTimes.map(altTime => (
-                          <Button key={altTime} variant="secondary" size="sm" onClick={() => handleTimeSelect(altTime)}>
-                            {altTime}
+                        if (isBooked) {
+                            variant = "destructive";
+                        } else if (isSelected) {
+                            variant = "default";
+                        } else {
+                            variant = "success";
+                        }
+
+                        return (
+                          <Button
+                            key={time}
+                            type="button"
+                            variant={variant}
+                            onClick={() => handleTimeSelect(time)}
+                            disabled={isBooked}
+                            className="relative"
+                          >
+                            {time}
                           </Button>
-                        ))}
-                      </div>
-                    </AlertDescription>
-                  </Alert>
-                )}
+                        );
+                      })}
+                </div>
               </div>
             )}
 

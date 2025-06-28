@@ -173,7 +173,7 @@ export async function getWorks(): Promise<Work[]> {
 }
 
 const addImageSchema = z.object({
-    src: z.string().url(),
+    src: z.string().min(1, 'Image data is required'),
     alt: z.string().min(1),
     hint: z.string().min(1),
 });
@@ -185,11 +185,14 @@ export async function addImage(formData: FormData) {
         hint: formData.get('hint') as string,
     }
     const result = addImageSchema.safeParse(newWork);
-    if (result.success) {
-        globalForDb.works.unshift(result.data);
-        revalidatePath('/admin/gallery');
-        revalidatePath('/');
+    if (!result.success) {
+        return { error: result.error.errors.map(e => e.message).join(', ') };
     }
+
+    globalForDb.works.unshift(result.data);
+    revalidatePath('/admin/gallery');
+    revalidatePath('/');
+    return { success: true };
 }
 
 const removeImageSchema = z.object({

@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { format } from "date-fns";
+import { bs } from "date-fns/locale";
 import Image from "next/image";
 import { Calendar as CalendarIcon, Clock, User, Phone, Scissors, Loader2, PartyPopper, AlertTriangle, ArrowRight, ArrowLeft } from "lucide-react";
 
@@ -121,7 +122,7 @@ export function BookingForm() {
                               variant={"outline"}
                               className={cn("w-[240px] pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
                             >
-                              {field.value ? format(field.value, "PPP") : <span>Izaberite datum</span>}
+                              {field.value ? format(field.value, "PPP", { locale: bs }) : <span>Izaberite datum</span>}
                               <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                             </Button>
                           </FormControl>
@@ -133,6 +134,7 @@ export function BookingForm() {
                             onSelect={field.onChange}
                             disabled={(date) => date < new Date(new Date().setDate(new Date().getDate() - 1))}
                             initialFocus
+                            locale={bs}
                           />
                         </PopoverContent>
                       </Popover>
@@ -253,7 +255,7 @@ export function BookingForm() {
                     <h3 className="font-headline text-2xl">Potvrdite Vašu Rezervaciju</h3>
                     <Card className="text-left max-w-md mx-auto">
                         <CardContent className="p-6 space-y-4">
-                            <div className="flex items-center gap-4"><CalendarIcon className="w-5 h-5 text-muted-foreground" /><p><strong>Datum:</strong> {format(form.getValues("date"), "PPP")}</p></div>
+                            <div className="flex items-center gap-4"><CalendarIcon className="w-5 h-5 text-muted-foreground" /><p><strong>Datum:</strong> {format(form.getValues("date"), "PPP", { locale: bs })}</p></div>
                             <div className="flex items-center gap-4"><Clock className="w-5 h-5 text-muted-foreground" /><p><strong>Vrijeme:</strong> {form.getValues("time")}</p></div>
                             <div className="flex items-center gap-4"><Scissors className="w-5 h-5 text-muted-foreground" /><p><strong>Barber:</strong> {form.getValues("barber")}</p></div>
                             <div className="flex items-center gap-4"><User className="w-5 h-5 text-muted-foreground" /><p><strong>Ime:</strong> {form.getValues("name")}</p></div>

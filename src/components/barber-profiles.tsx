@@ -1,7 +1,6 @@
 
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Scissors } from "lucide-react";
 
 const barbers = [
   {

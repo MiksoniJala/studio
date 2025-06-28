@@ -2,6 +2,8 @@
 import { BookingForm } from "@/components/booking-form";
 import { BarberProfiles } from "@/components/barber-profiles";
 import { WorkShowcase } from "@/components/work-showcase";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -43,8 +45,11 @@ export default function Home() {
 
       </main>
       <footer className="bg-card border-t mt-12">
-          <div className="container mx-auto py-6 px-4 text-center text-muted-foreground">
+          <div className="container mx-auto py-6 px-4 text-center text-muted-foreground space-y-4">
               <p>&copy; {new Date().getFullYear()} Miki Barber. Sva prava zadržana.</p>
+              <Button asChild variant="link">
+                <Link href="/admin/login">Admin Panel</Link>
+              </Button>
           </div>
       </footer>
     </div>

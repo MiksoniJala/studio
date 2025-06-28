@@ -55,7 +55,20 @@ export async function createBooking(data: BookingFormData) {
   return { success: true };
 }
 
+export type LoginState = {
+  message: string | null;
+};
 
-export async function loginAction() {
+export async function loginAction(
+  prevState: LoginState,
+  formData: FormData
+): Promise<LoginState> {
+  const email = formData.get('email');
+  const password = formData.get('password');
+
+  if (email === 'admin@primjer.com' && password === 'ryze2025') {
     redirect('/admin');
+  }
+
+  return { message: 'Nevažeći email ili lozinka.' };
 }

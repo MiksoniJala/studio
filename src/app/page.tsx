@@ -63,7 +63,7 @@ export default function Home() {
         </motion.div>
       </section>
 
-      <main className="flex-grow container mx-auto px-4 py-16 md:py-24 space-y-24 md:space-y-32 overflow-hidden">
+      <main className="flex-grow container mx-auto px-4 py-16 md:py-24 space-y-24 md:space-y-32">
         
         <motion.div
           initial="hidden"

@@ -10,7 +10,7 @@ const barbers = [
   },
   {
     name: "Huske",
-    description: "Huske donosi svjež, umjetnički pristup berberskom zanatu. Specijalizirao se za kreativne fadeove, oštre linije i ne boji se eksperimentisati sa novim trendovima.",
+    description: "Mladi i perspektivni frizer na praksi, poznat po velikoj želji za učenjem i istraživanjem novih trendova. Huske sa strašću prati moderne tehnike šišanja i stylinga, ne boji se eksperimentisati i uvijek je spreman ponuditi klijentima svježe, originalne ideje. Njegov entuzijazam, kreativnost i pristupačnost čine ga odličnim izborom za svakoga ko želi isprobati nešto novo i moderno.",
     image: "https://placehold.co/400x400.png",
     hint: "modern barber portrait"
   }

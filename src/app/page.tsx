@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef } from 'react';
@@ -8,6 +9,7 @@ import { WorkShowcase } from "@/components/work-showcase";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ChevronDown } from 'lucide-react';
+import Image from "next/image";
 
 export default function Home() {
   const [selectedBarber, setSelectedBarber] = useState<string | null>(null);
@@ -36,11 +38,24 @@ export default function Home() {
     <div className="flex flex-col min-h-screen bg-background text-foreground">
       
       <section className="min-h-screen flex flex-col items-center justify-center text-center p-4">
+        <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+        >
+            <Image
+                src="/logo.png"
+                alt="Miki Barber Shop Logo"
+                width={150}
+                height={150}
+                className="rounded-full mx-auto mb-8"
+            />
+        </motion.div>
         <motion.h1 
             className="font-headline text-5xl md:text-7xl font-bold tracking-tight"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
         >
           Dobrodošli u Miki Barber Shop
         </motion.h1>
@@ -48,7 +63,7 @@ export default function Home() {
           className="mt-4 text-lg text-muted-foreground"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+          transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
         >
           Odaberite svog barbera i rezervišite termin online.
         </motion.p>
@@ -56,7 +71,7 @@ export default function Home() {
             className="mt-12 flex flex-col items-center gap-2 text-muted-foreground"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
+            transition={{ duration: 0.8, delay: 0.7 }}
         >
           <span className="font-body tracking-wider text-sm">scroll down</span>
           <ChevronDown className="h-6 w-6 animate-bounce" />

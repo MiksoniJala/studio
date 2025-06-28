@@ -16,9 +16,10 @@ interface HomePageClientProps {
   barbers: Barber[];
   works: Work[];
   nonWorkingDays: string[];
+  appVersion: string;
 }
 
-export function HomePageClient({ barbers, works, nonWorkingDays }: HomePageClientProps) {
+export function HomePageClient({ barbers, works, nonWorkingDays, appVersion }: HomePageClientProps) {
   const [selectedBarber, setSelectedBarber] = useState<string | null>(null);
   const bookingRef = useRef<HTMLDivElement>(null);
 
@@ -130,11 +131,12 @@ export function HomePageClient({ barbers, works, nonWorkingDays }: HomePageClien
 
       </main>
       <footer className="bg-card border-t mt-12">
-          <div className="container mx-auto py-6 px-4 text-center text-muted-foreground space-y-4">
+          <div className="container mx-auto py-6 px-4 text-center text-muted-foreground space-y-2">
               <p>&copy; {new Date().getFullYear()} Miki Barber Shop. Sva prava zadržana.</p>
               <Button asChild variant="link">
                 <Link href="/admin/login">Admin Panel</Link>
               </Button>
+              <p className="text-xs text-muted-foreground/70">Verzija {appVersion}</p>
           </div>
       </footer>
     </div>

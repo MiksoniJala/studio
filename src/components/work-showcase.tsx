@@ -57,6 +57,7 @@ export function WorkShowcase({ works }: WorkShowcaseProps) {
                       height={400}
                       className="object-cover w-full h-full transition-transform duration-300 ease-in-out group-hover:scale-105"
                       data-ai-hint={work.hint}
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
               </CardContent>
             </Card>

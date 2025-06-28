@@ -66,6 +66,7 @@ export function HomePageClient({ barbers, works, nonWorkingDays }: HomePageClien
                 width={150}
                 height={150}
                 className="rounded-full mx-auto mb-8"
+                priority
             />
         </motion.div>
         <motion.h1 

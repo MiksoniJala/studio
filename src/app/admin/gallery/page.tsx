@@ -51,6 +51,7 @@ export default async function GalleryAdminPage() {
                                 height={400}
                                 className="object-cover w-full h-full rounded-md"
                                 data-ai-hint={work.hint}
+                                sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
                             />
                             <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                 <form action={removeImage}>

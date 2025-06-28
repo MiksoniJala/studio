@@ -5,6 +5,7 @@ import {
   Calendar,
   Home,
   Image as ImageIcon,
+  LogOut,
   Settings,
   Users,
 } from "lucide-react";
@@ -19,6 +20,7 @@ import {
   SidebarInset,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { logoutAction } from "@/lib/actions";
 
 export default function AdminLayout({
   children,
@@ -83,6 +85,14 @@ export default function AdminLayout({
                   Početna Stranica
                 </Link>
               </SidebarMenuButton>
+            </SidebarMenuItem>
+             <SidebarMenuItem>
+               <form action={logoutAction} className="w-full">
+                 <SidebarMenuButton type="submit" className="w-full">
+                    <LogOut />
+                    Odjavi se
+                 </SidebarMenuButton>
+               </form>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>

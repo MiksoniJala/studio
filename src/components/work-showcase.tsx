@@ -4,16 +4,11 @@
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
+import type { Work } from '@/lib/actions';
 
-const works = [
-  { src: "https://placehold.co/600x400.png", alt: "Moderna frizura sa čistim fadeom", hint: "stylish haircut" },
-  { src: "https://placehold.co/600x400.png", alt: "Precizno šišanje i oblikovanje brade", hint: "beard trim" },
-  { src: "https://placehold.co/600x400.png", alt: "Klasična muška frizura", hint: "classic haircut" },
-  { src: "https://placehold.co/600x400.png", alt: "Moderna teksturirana frizura", hint: "modern hairstyle" },
-  { src: "https://placehold.co/600x400.png", alt: "Oštra linija na svježoj frizuri", hint: "sharp lineup" },
-  { src: "https://placehold.co/600x400.png", alt: "Usluga brijanja vrućim peškirom", hint: "hot towel" },
-];
-
+interface WorkShowcaseProps {
+    works: Work[];
+}
 
 const containerVariants = {
   hidden: { opacity: 1 },
@@ -37,7 +32,7 @@ const itemVariants = {
   },
 };
 
-export function WorkShowcase() {
+export function WorkShowcase({ works }: WorkShowcaseProps) {
   return (
     <section>
       <div className="text-center mb-12">
@@ -47,6 +42,9 @@ export function WorkShowcase() {
       <motion.div 
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"
         variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
       >
         {works.map((work, index) => (
           <motion.div key={index} variants={itemVariants}>

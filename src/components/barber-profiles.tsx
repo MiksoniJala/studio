@@ -3,24 +3,11 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-
-const barbers = [
-  {
-    name: "Miki",
-    description: "Specijalizovan za klasične fade frizure, precizno oblikovanje brade i frizure inspirisane tattoo art stilom. Sa svojih 18 godina, Miki donosi svježinu i kreativnost u svaki rez, kombinujući moderno s klasičnim tehnikama. Njegova preciznost, osjećaj za detalje i posvećenost klijentima čine ga savršenim izborom za one koji žele upečatljiv i besprijekoran izgled.",
-    image: "https://placehold.co/400x400.png",
-    hint: "classic barber portrait"
-  },
-  {
-    name: "Huske",
-    description: "Mladi i perspektivni frizer na praksi, poznat po velikoj želji za učenjem i istraživanjem novih trendova. Huske sa strašću prati moderne tehnike šišanja i stylinga, ne boji se eksperimentisati i uvijek je spreman ponuditi klijentima svježe, originalne ideje. Njegov entuzijazam, kreativnost i pristupačnost čine ga odličnim izborom za svakoga ko želi isprobati nešto novo i moderno.",
-    image: "https://placehold.co/400x400.png",
-    hint: "modern barber portrait"
-  }
-];
+import type { Barber } from "@/lib/actions";
 
 interface BarberProfilesProps {
     onSelectBarber: (name: string) => void;
+    barbers: Barber[];
 }
 
 const containerVariants = {
@@ -46,7 +33,7 @@ const profileVariants = {
   },
 };
 
-export function BarberProfiles({ onSelectBarber }: BarberProfilesProps) {
+export function BarberProfiles({ onSelectBarber, barbers }: BarberProfilesProps) {
   return (
     <section>
       <div className="text-center mb-12">
@@ -56,6 +43,9 @@ export function BarberProfiles({ onSelectBarber }: BarberProfilesProps) {
       <motion.div 
         className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12"
         variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
       >
         {barbers.map((barber) => (
           <motion.div 

@@ -44,6 +44,14 @@ export default function Home() {
         >
           Dobrodošli u Miki Barber Shop
         </motion.h1>
+        <motion.p 
+          className="mt-4 text-lg text-muted-foreground"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+        >
+          Odaberite svog barbera i rezervišite termin online.
+        </motion.p>
         <motion.div 
             className="mt-12 flex flex-col items-center gap-2 text-muted-foreground"
             initial={{ opacity: 0 }}
@@ -69,9 +77,9 @@ export default function Home() {
         <div ref={bookingRef}>
           {selectedBarber && (
               <motion.div 
-                  initial="hidden"
-                  animate="visible"
-                  variants={sectionVariants}
+                  initial={{height: 0, opacity: 0}}
+                  animate={{height: 'auto', opacity: 1}}
+                  transition={{duration: 0.7, ease: "easeOut"}}
               >
                   <BookingForm barber={selectedBarber} />
               </motion.div>
